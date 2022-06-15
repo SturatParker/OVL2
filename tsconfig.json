@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": ".",
+    "baseUrl": "src",
+    "outDir": "dist",
+    "skipLibCheck": false,
+    "esModuleInterop": true,
+    "paths": {
+      "src/*": ["./*"]
+    },
+    "plugins": [{ "transform": "typescript-transform-paths" }]
+  },
+  "ts-node": {
+    "transpileOnly": true,
+    "require": [
+      "typescript-transform-paths/register",
+      "tsconfig-paths/register"
+    ]
+  }
+}

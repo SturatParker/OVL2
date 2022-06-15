@@ -1,0 +1,17 @@
+## Extensions
+*.*
+!*.js
+!*.ts
+!*.css
+!*.scss
+!*.json
+!*.html
+
+# Ignore all files in these folders
+/node_modules
+/dist
+/coverage
+/testresults
+
+# Misc
+package-lock.json
