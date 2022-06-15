@@ -6,13 +6,15 @@
   "scripts": {
     "lint": "eslint . --ext .ts --fix",
     "build": "ttsc -p tsconfig.json",
-    "serve": "node .",
-    "dev": "ts-node-dev src/index.ts",
+    "serve": "node -r dotenv/config .",
+    "serve:production": "set NODE_ENV=production&& node -r dotenv/config .",
+    "dev": "ts-node-dev -r dotenv/config src/index.ts",
     "test": "jest --coverage"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "discord.js": "^13.8.0",
     "dotenv": "^16.0.1"
   },
   "devDependencies": {
