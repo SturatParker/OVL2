@@ -4,6 +4,7 @@ import {
   onError,
   onGuildMemberAdd,
   onGuildMemberRemove,
+  onInteractionCreate,
   onReady,
 } from 'src/events';
 
@@ -19,7 +20,13 @@ const client = new Client({
   ],
 });
 
-[onError, onGuildMemberAdd, onGuildMemberRemove, onReady].forEach((handler) => {
+[
+  onError,
+  onGuildMemberAdd,
+  onGuildMemberRemove,
+  onReady,
+  onInteractionCreate,
+].forEach((handler) => {
   client.on(handler.event, handler.callback);
 });
 
