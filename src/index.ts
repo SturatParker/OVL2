@@ -11,7 +11,8 @@ import {
   onGuildMemberRemove,
   onReady,
 } from 'src/events';
-import { MongoService, PollingService } from './services/database.service';
+import { MongoService } from './services/database/mongoService.service';
+import { PollingService } from './services/database/pollingService.service';
 
 void (async () => {
   const client = new Client({
@@ -77,10 +78,12 @@ void (async () => {
   });
 
   const mongoService = new MongoService();
-  const pollingService = new PollingService(mongoService);
 
   console.log('Connecting to mongodb...');
   await mongoService.connect();
+  const pollingService = new PollingService(mongoService);
+  pollingService.collection.insertOne({ channelId: '1234' });
+
   console.log('Connection to mongodb established');
   console.log('Connecting to discord...');
   await client.login();
