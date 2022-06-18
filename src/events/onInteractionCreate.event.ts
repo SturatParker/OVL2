@@ -1,17 +1,20 @@
 import { Interaction } from 'discord.js';
-import { poll } from 'src/commands/poll/poll.command';
-import { ClientEventCallback } from 'src/common/types/ClientEventCallback.type';
+import { Command } from 'src/common/models/command.model';
 import { ClientEventHandler } from 'src/common/types/ClientEventHandler.type';
+import { PollCommand } from './../commands/poll/poll.command';
+import { PollingService } from './../services/database/pollingService.service';
 
-export const processCommand: ClientEventCallback<'interactionCreate'> = (
-  interaction: Interaction
-) => {
-  if (!interaction.isCommand()) return;
-  const commands = [poll];
-  commands
-    .find((command) => command.name == interaction.commandName)
-    ?.execute(interaction);
-};
-
-export const onInteractionCreate: ClientEventHandler<'interactionCreate'> =
-  new ClientEventHandler('interactionCreate', processCommand);
+export class CommandHandler extends ClientEventHandler<'interactionCreate'> {
+  commands: Command[];
+  poll: Command;
+  constructor(private pollService: PollingService) {
+    super('interactionCreate', (interaction: Interaction) => {
+      if (!interaction.isCommand()) return;
+      this.commands
+        .find((command) => command.name == interaction.commandName)
+        ?.execute(interaction);
+    });
+    this.poll = new PollCommand(pollService);
+    this.commands = [this.poll];
+  }
+}

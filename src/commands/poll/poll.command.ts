@@ -1,64 +1,86 @@
 import { CommandInteraction } from 'discord.js';
 import { Command } from '../../common/models/command.model';
+import { PollingService } from './../../services/database/pollingService.service';
 import { pollDefinition } from './poll.definition';
 
-export const poll = new Command(
-  pollDefinition,
-  (interaction: CommandInteraction): Promise<void> => {
-    this;
-    const options = interaction.options;
-    const subcommandName = options.getSubcommand();
-    const replyFn = Command.getInteractionReplyFn(interaction);
-    const channel = options.getChannel('channel');
+export class PollCommand extends Command<typeof pollDefinition> {
+  constructor(private pollService: PollingService) {
+    super(pollDefinition, async (interaction) => {
+      const options = interaction.options;
+      const subCommandName = options.getSubcommand();
+      const replyFn = this.getInteractionReplyFn(interaction);
 
-    switch (subcommandName) {
-      case 'set':
-        const maxVotes = options.getInteger('maxVotes');
-        const maxSelfVotes = options.getInteger('maxSelfVotes');
-        return void replyFn({
-          content: `Poll tracking enabled in <#${channel.id}>`,
-          ephemeral: true,
-        });
-        break;
-      case 'unset':
-        return void replyFn({
-          content: `Poll tracking disabled in <#${channel.id}>`,
-          ephemeral: true,
-        });
-        break;
-      case 'open':
-        return void replyFn({
-          content: `Opened voting in <#${channel.id}>`,
-          ephemeral: true,
-        });
-        break;
-      case 'close':
-        return void replyFn({
-          content: `Closed voting in <#${channel.id}>`,
-          ephemeral: true,
-        });
-        break;
-      case 'shuffle':
-        return void replyFn({
-          content: `Shuffling in <#${channel.id}>`,
-          ephemeral: true,
-        });
-        break;
-      case 'winner':
-        return void replyFn({
-          content: `Winner of <#${channel.id}> is \${topSubmission.toString()}`,
-          ephemeral: true,
-        });
-        break;
-      case 'random':
-        return void replyFn({
-          content: `Randomly selected winner of <#${channel.id}> is \${randomSubmission.toString()}`,
-          ephemeral: true,
-        });
-        break;
-      default:
-        break;
-    }
-    return;
+      switch (subCommandName) {
+        case 'set':
+          return this.set(interaction);
+        case 'unset':
+          return this.unset(interaction);
+        case 'open':
+          return this.open(interaction);
+        case 'close':
+          return this.close(interaction);
+        case 'winner':
+          return this.winner(interaction);
+        case 'random':
+          return this.random(interaction);
+        case 'shuffle':
+          return this.shuffle(interaction);
+        default:
+          return;
+      }
+    });
   }
-);
+
+  public async set(interaction: CommandInteraction): Promise<void> {
+    if (!interaction.inGuild())
+      return interaction.reply({
+        content: 'This command must be performed in a guild',
+        ephemeral: true,
+      });
+    const channel = interaction.options.getChannel('channel', true);
+    const maxVotes = interaction.options.getInteger('max_votes', true);
+    const maxSelfVotes = interaction.options.getInteger('max_self_votes', true);
+
+    let poll = await this.pollService.getPoll(channel.id);
+    if (poll) {
+      return interaction.reply({
+        content: `${channel.name} is already a Poll channel`,
+        ephemeral: true,
+      });
+    }
+    poll = await this.pollService.createPoll({
+      channelId: channel.id,
+      guildId: interaction.guildId,
+      isOpen: true,
+      votes: [],
+      maxVotes,
+      maxSelfVotes,
+    });
+    return interaction.reply({
+      content: `Created a new poll for ${channel.name}`,
+      ephemeral: true,
+    });
+  }
+
+  public async unset(interaction: CommandInteraction) {
+    return Command.notYetImplemented(interaction);
+  }
+  public async open(interaction: CommandInteraction) {
+    return Command.notYetImplemented(interaction);
+  }
+
+  public async close(interaction: CommandInteraction) {
+    return Command.notYetImplemented(interaction);
+  }
+
+  public async winner(interaction: CommandInteraction) {
+    return Command.notYetImplemented(interaction);
+  }
+
+  public async random(interaction: CommandInteraction) {
+    return Command.notYetImplemented(interaction);
+  }
+  public async shuffle(interaction: CommandInteraction) {
+    return Command.notYetImplemented(interaction);
+  }
+}

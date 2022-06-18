@@ -1,24 +1,25 @@
 import { Client } from 'discord.js';
-import { ClientEventCallback } from 'src/common/types/ClientEventCallback.type';
+import { Command } from 'src/common/models/command.model';
 import { ClientEventHandler } from 'src/common/types/ClientEventHandler.type';
-import { poll } from '../commands/poll/poll.command';
 
-export const logReady: ClientEventCallback<'ready'> = (client: Client) => {
-  const homeGuild = client.guilds.cache.get(process.env.HOME_GUILD_ID);
-  const isProduction = process.env.NODE_ENV === 'production';
+export class ReadyHandler extends ClientEventHandler<'ready'> {
+  constructor(commands: Command[]) {
+    super('ready', (client: Client) => {
+      const homeGuild = client.guilds.cache.get(
+        process.env.HOME_GUILD_ID ?? ''
+      );
+      const isProduction = process.env.NODE_ENV === 'production';
 
-  const commands = isProduction
-    ? client.application.commands
-    : homeGuild.commands;
+      const commandManager = isProduction
+        ? client.application?.commands
+        : homeGuild?.commands;
 
-  if (!commands) return;
-  [poll].forEach((command) => {
-    commands.create(command.data as any);
-  });
-  console.log(`Client ready as ${client.user.tag}`);
-};
-
-export const onReady: ClientEventHandler<'ready'> = new ClientEventHandler(
-  'ready',
-  logReady
-);
+      if (!commandManager) return;
+      commands.forEach((command) => {
+        console.log(`Registering command: ${command.data}`);
+        commandManager.create(command.data as any);
+      });
+      console.log(`Client ready as ${client.user?.tag}`);
+    });
+  }
+}

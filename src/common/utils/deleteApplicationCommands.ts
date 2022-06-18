@@ -7,16 +7,15 @@ export async function deleteApplicationCommands(token: string): Promise<void> {
   await client.login(token);
 
   const rest = new REST({ version: '9' }).setToken(token);
-
-  await rest
-    .get(Routes.applicationCommands(client.user.id))
-    .then((data: ApplicationCommand[]) =>
-      Promise.all(
-        data.map((command) => {
-          rest.delete(
-            `${Routes.applicationCommands(client.user.id)}/${command.id}`
-          );
-        })
-      )
-    );
+  const userId = client.user?.id;
+  if (!userId) return;
+  const data = (await rest.get(
+    Routes.applicationCommands(userId)
+  )) as ApplicationCommand[];
+  await Promise.all(
+    data.map((command) =>
+      rest.delete(`${Routes.applicationCommands(userId)}/${command.id}`)
+    )
+  );
+  return;
 }

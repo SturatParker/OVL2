@@ -10,7 +10,11 @@
     "paths": {
       "src/*": ["./*"]
     },
-    "plugins": [{ "transform": "typescript-transform-paths" }]
+    "plugins": [{ "transform": "typescript-transform-paths" }],
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "strictPropertyInitialization": true
   },
   "ts-node": {
     "transpileOnly": true,

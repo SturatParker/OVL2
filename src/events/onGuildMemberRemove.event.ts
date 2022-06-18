@@ -13,7 +13,7 @@ export const logGuildMemberRemove: ClientEventCallback<'guildMemberRemove'> = (
 
   const joinedAt = guildMember.joinedAt;
   const now = new Date(Date.now());
-  const presentPeriod = new Period(joinedAt, now);
+  const presentPeriod = joinedAt ? new Period(joinedAt, now) : undefined;
 
   const embed = new MessageEmbed({
     author: { name: guildMember.user.tag, iconURL },
@@ -22,12 +22,17 @@ export const logGuildMemberRemove: ClientEventCallback<'guildMemberRemove'> = (
     fields: [
       {
         name: 'Member since',
-        value: joinedAt.toLocaleString('en', {
-          dateStyle: 'medium',
-        }),
+        value: joinedAt
+          ? joinedAt.toLocaleString('en', {
+              dateStyle: 'medium',
+            })
+          : 'Unknown',
         inline: true,
       },
-      { name: 'Duration as member', value: presentPeriod.toString() },
+      {
+        name: 'Duration as member',
+        value: presentPeriod ? presentPeriod.toString() : 'Unknown',
+      },
     ],
     color: ColourUtils.error,
     timestamp: Date.now(),

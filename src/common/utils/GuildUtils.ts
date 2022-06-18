@@ -10,7 +10,7 @@ export class GuildUtils {
         channel.name.toLocaleLowerCase() == 'log' &&
         channel.type == 'GUILD_TEXT'
     );
-    if (logChannel.type != 'GUILD_TEXT')
+    if (logChannel?.type != 'GUILD_TEXT')
       return new Promise((resolve, reject) => {
         reject(`Unable to find log channel in guild ${guild.name}`);
       });

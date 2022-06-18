@@ -4,13 +4,15 @@ import {
   GuildApplicationCommandManager,
   Intents,
 } from 'discord.js';
+import { ClientEventHandler } from 'src/common/types/ClientEventHandler.type';
 import {
+  CommandHandler,
   onError,
   onGuildMemberAdd,
   onGuildMemberRemove,
-  onReady,
 } from 'src/events';
-import { onInteractionCreate } from './../events/onInteractionCreate.event';
+import { ReadyHandler } from './../events/onReady.event';
+
 import { SubmissionService } from './database/databaseService.service';
 import { MongoService } from './database/mongoService.service';
 import { PollingService } from './database/pollingService.service';
@@ -18,11 +20,16 @@ import { PollingService } from './database/pollingService.service';
 export class OVLClientService {
   client: Client;
   mongoService: MongoService;
-  pollService: PollingService;
-  submissionService: SubmissionService;
+  pollService?: PollingService;
+  submissionService?: SubmissionService;
+
+  readyHandler?: ReadyHandler;
+  commandHandler?: CommandHandler;
 
   constructor() {
     this.mongoService = new MongoService();
+    this.pollService = new PollingService(this.mongoService);
+    this.submissionService = new SubmissionService(this.mongoService);
     this.client = new Client({
       partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER'],
       intents: [
@@ -59,19 +66,33 @@ export class OVLClientService {
   }
 
   private registerClientEvents() {
-    [
+    console.log('Registering client event handlers');
+    if (!this.pollService || !this.submissionService) return;
+    const events: ClientEventHandler<any>[] = [
       onError,
       onGuildMemberAdd,
       onGuildMemberRemove,
-      onReady,
-      onInteractionCreate,
-    ].forEach((handler) => {
-      this.client.on(handler.event, handler.callback);
+    ];
+
+    this.commandHandler = new CommandHandler(this.pollService);
+    this.readyHandler = new ReadyHandler(this.commandHandler.commands);
+
+    events.push(this.commandHandler, this.readyHandler);
+
+    events.forEach((handler: ClientEventHandler<any>): void => {
+      handler.event;
+      handler.callback;
+      this.client.on(handler.event, (...args) => {
+        handler.callback(...args);
+      });
     });
 
     this.client.on('ready', (client) => {
-      const homeGuild = client.guilds.cache.get(process.env.HOME_GUILD_ID);
-      const isProduction = process.env.NODE_ENV === 'production';
+      const { HOME_GUILD_ID, NODE_ENV } = process.env;
+      const homeGuild = HOME_GUILD_ID
+        ? client.guilds.cache.get(HOME_GUILD_ID)
+        : undefined;
+      const isProduction = NODE_ENV === 'production';
 
       let commands: GuildApplicationCommandManager | ApplicationCommandManager;
       if (homeGuild && !isProduction) {
@@ -79,19 +100,6 @@ export class OVLClientService {
       } else {
         commands = client.application.commands;
       }
-
-      void commands.create({
-        name: 'poll',
-        description: 'Poll',
-        options: [
-          {
-            name: 'subcommand',
-            description: 'subcommand',
-            type: 'SUB_COMMAND',
-            options: [],
-          },
-        ],
-      });
     });
   }
 
@@ -101,15 +109,17 @@ export class OVLClientService {
       if (message.author.bot) return;
       switch (message.content) {
         case 'onReady':
-          onReady.callback(message.client);
+          this.readyHandler?.callback(message.client);
           break;
         case 'onError':
           onError.callback(new Error(message.content));
           break;
         case 'onGuildMemberAdd':
+          if (!message.member) return;
           onGuildMemberAdd.callback(message.member);
           break;
         case 'onGuildMemberRemove':
+          if (!message.member) return;
           onGuildMemberRemove.callback(message.member);
           break;
       }

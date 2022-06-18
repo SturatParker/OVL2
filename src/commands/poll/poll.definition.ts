@@ -1,11 +1,11 @@
 import { ApplicationCommandSubGroupData } from 'discord.js';
-import { close } from './close/close';
-import { open } from './open/open';
-import { random } from './random/random';
-import { set } from './set/set.definition';
-import { shuffle } from './shuffle/shuffle';
-import { unset } from './unset/unset';
-import { winner } from './winner/winner';
+import { close } from './definitions/close';
+import { open } from './definitions/open';
+import { random } from './definitions/random';
+import { set } from './definitions/set';
+import { shuffle } from './definitions/shuffle';
+import { unset } from './definitions/unset';
+import { winner } from './definitions/winner';
 
 export const pollDefinition: ApplicationCommandSubGroupData = {
   name: 'poll',
