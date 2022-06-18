@@ -10,6 +10,7 @@ import {
   onGuildMemberRemove,
   onReady,
 } from 'src/events';
+import { onInteractionCreate } from './../events/onInteractionCreate.event';
 import { SubmissionService } from './database/databaseService.service';
 import { MongoService } from './database/mongoService.service';
 import { PollingService } from './database/pollingService.service';
@@ -58,11 +59,15 @@ export class OVLClientService {
   }
 
   private registerClientEvents() {
-    [onError, onGuildMemberAdd, onGuildMemberRemove, onReady].forEach(
-      (handler) => {
-        this.client.on(handler.event, handler.callback);
-      }
-    );
+    [
+      onError,
+      onGuildMemberAdd,
+      onGuildMemberRemove,
+      onReady,
+      onInteractionCreate,
+    ].forEach((handler) => {
+      this.client.on(handler.event, handler.callback);
+    });
 
     this.client.on('ready', (client) => {
       const homeGuild = client.guilds.cache.get(process.env.HOME_GUILD_ID);
