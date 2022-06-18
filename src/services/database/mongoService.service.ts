@@ -19,7 +19,7 @@ export class MongoService {
     });
   }
   public async connect() {
-    console.log(`Connecting to ${this.uri}`);
+    console.log(`Connecting to ${process.env.DB_URL}`);
     await this.client.connect();
     return this.client;
   }
