@@ -20,28 +20,11 @@ export class MongoService {
   }
   public async connect() {
     console.log(`Connecting to ${this.uri}`);
-    return await this.client.connect();
+    await this.client.connect();
+    return this.client;
   }
 
   public db(dbName?: string, options?: DbOptions): Db {
     return this.client.db(dbName, options);
-  }
-}
-
-export abstract class DatabaseService {
-  public abstract collections: { [key: string]: Collection };
-  public abstract db: Db;
-  constructor(private mongoService: MongoService) {}
-}
-
-export class PollingService extends DatabaseService {
-  public collections: { polls: Collection };
-  public db: Db;
-  constructor(private databaseService: MongoService) {
-    super(databaseService);
-    this.db = databaseService.db('Polling');
-    this.collections = {
-      polls: this.db.collection('polls'),
-    };
   }
 }
