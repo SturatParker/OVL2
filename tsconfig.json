@@ -12,6 +12,7 @@
     },
     "plugins": [{ "transform": "typescript-transform-paths" }],
     "strict": true,
+    "alwaysStrict": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "strictPropertyInitialization": true

@@ -3,7 +3,7 @@ import { IPoll, Poll } from 'src/common/models/poll.model';
 import { DatabaseService } from './databaseService.service';
 import { MongoService } from './mongoService.service';
 
-export class PollingService extends DatabaseService<Poll> {
+export class PollService extends DatabaseService<Poll> {
   public collection: Collection<Poll>;
   public db: Db;
   constructor(mongoService: MongoService) {
@@ -21,5 +21,10 @@ export class PollingService extends DatabaseService<Poll> {
     const response = await this.collection.findOne({ channelId });
     if (!response) return;
     return new Poll(response);
+  }
+
+  public async deletePoll(channelId: string): Promise<void> {
+    await this.collection.findOneAndDelete({ channelId });
+    return;
   }
 }

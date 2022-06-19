@@ -1,14 +1,13 @@
 import { CommandInteraction } from 'discord.js';
 import { Command } from '../../common/models/command.model';
-import { PollingService } from './../../services/database/pollingService.service';
+import { PollService } from '../../services/database/pollService.service';
 import { pollDefinition } from './poll.definition';
 
 export class PollCommand extends Command<typeof pollDefinition> {
-  constructor(private pollService: PollingService) {
+  constructor(private pollService: PollService) {
     super(pollDefinition, async (interaction) => {
       const options = interaction.options;
       const subCommandName = options.getSubcommand();
-      const replyFn = this.getInteractionReplyFn(interaction);
 
       switch (subCommandName) {
         case 'set':
@@ -52,7 +51,6 @@ export class PollCommand extends Command<typeof pollDefinition> {
       channelId: channel.id,
       guildId: interaction.guildId,
       isOpen: true,
-      votes: [],
       maxVotes,
       maxSelfVotes,
     });

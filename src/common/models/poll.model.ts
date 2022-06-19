@@ -5,7 +5,6 @@ export interface IPoll {
   guildId: string;
   channelId: string;
   isOpen: boolean;
-  votes: ObjectId[];
   maxVotes: number;
   maxSelfVotes: number;
 }
@@ -15,7 +14,6 @@ export class Poll implements IPoll {
   guildId: string;
   channelId: string;
   isOpen: boolean;
-  votes: ObjectId[];
   maxVotes: number;
   maxSelfVotes: number;
 
@@ -24,7 +22,6 @@ export class Poll implements IPoll {
     this.guildId = options.guildId;
     this.channelId = options.channelId;
     this.isOpen = options.isOpen;
-    this.votes = options.votes;
     this.maxVotes = options.maxVotes;
     this.maxSelfVotes = options.maxSelfVotes;
   }

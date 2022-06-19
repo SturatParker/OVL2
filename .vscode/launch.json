@@ -14,13 +14,6 @@
       "internalConsoleOptions": "openOnSessionStart",
       "skipFiles": ["<node_internals>/**"]
     },
-    {
-      "name": "ts-node",
-      "type": "pwa-node",
-      "request": "launch",
-      "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
-      "args": ["${workspaceFolder}/src/index.ts", "--ts-node"],
-      "cwd": "${workspaceRoot}"
-    }
+
   ]
 }

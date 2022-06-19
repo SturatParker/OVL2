@@ -4,7 +4,7 @@ import { ClientEventHandler } from 'src/common/types/ClientEventHandler.type';
 
 export class ReadyHandler extends ClientEventHandler<'ready'> {
   constructor(commands: Command[]) {
-    super('ready', (client: Client) => {
+    super('ready', async (client: Client) => {
       const homeGuild = client.guilds.cache.get(
         process.env.HOME_GUILD_ID ?? ''
       );
@@ -17,7 +17,7 @@ export class ReadyHandler extends ClientEventHandler<'ready'> {
       if (!commandManager) return;
       commands.forEach((command) => {
         console.log(`Registering command: ${command.data}`);
-        commandManager.create(command.data as any);
+        commandManager.create(command.data);
       });
       console.log(`Client ready as ${client.user?.tag}`);
     });

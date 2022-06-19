@@ -18,7 +18,7 @@ export class MongoService {
       serverApi: ServerApiVersion.v1,
     });
   }
-  public async connect() {
+  public async connect(): Promise<MongoClient> {
     console.log(`Connecting to ${process.env.DB_URL}`);
     await this.client.connect();
     return this.client;

@@ -5,9 +5,9 @@ import { ClientEventHandler } from '../common/types/ClientEventHandler.type';
 import { ColourUtils } from '../common/utils/ColourUtils';
 import { GuildUtils } from './../common/utils/GuildUtils';
 
-export const logGuildMemberAdd: ClientEventCallback<'guildMemberAdd'> = (
+export const logGuildMemberAdd: ClientEventCallback<'guildMemberAdd'> = async (
   guildMember: GuildMember
-): void => {
+): Promise<void> => {
   const iconURL =
     guildMember.user.avatarURL() ?? guildMember.user.defaultAvatarURL;
 

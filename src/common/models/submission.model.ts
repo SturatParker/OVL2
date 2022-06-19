@@ -1,3 +1,5 @@
+import { Message } from 'discord.js';
+
 export interface ISubmission {
   messageId: string;
   channelId: string;
@@ -5,7 +7,6 @@ export interface ISubmission {
   url: string;
   submittedBy: string;
   voterIds: string[];
-  voteCount: number;
 }
 
 export class Submission implements ISubmission {
@@ -26,5 +27,16 @@ export class Submission implements ISubmission {
     this.url = options.url;
     this.submittedBy = options.submittedBy;
     this.voterIds = options.voterIds;
+  }
+
+  static fromMessage(message: Message<true>): Submission {
+    return new Submission({
+      messageId: message.id,
+      channelId: message.channelId,
+      guildId: message.guildId,
+      submittedBy: message.mentions.users.first()?.id ?? '',
+      voterIds: [],
+      url: message.url,
+    });
   }
 }

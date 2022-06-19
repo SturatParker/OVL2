@@ -3,4 +3,4 @@ import { ClientEvent } from './ClientEvent.type';
 
 export type ClientEventCallback<E extends ClientEvent> = (
   ...args: ClientEvents[E]
-) => void;
+) => Promise<void>;
