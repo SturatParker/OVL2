@@ -60,25 +60,48 @@ export class PollCommand extends Command<typeof pollDefinition> {
     });
   }
 
-  public async unset(interaction: CommandInteraction) {
-    return Command.notYetImplemented(interaction);
+  public async unset(interaction: CommandInteraction): Promise<void> {
+    const channel = interaction.options.getChannel('channel', true);
+    await this.pollService.deletePoll(channel.id);
+    return interaction.reply({
+      content: `Removed polling from ${channel.name}`,
+      ephemeral: true,
+    });
   }
-  public async open(interaction: CommandInteraction) {
+
+  public async open(interaction: CommandInteraction): Promise<void> {
     return Command.notYetImplemented(interaction);
   }
 
-  public async close(interaction: CommandInteraction) {
+  public async close(interaction: CommandInteraction): Promise<void> {
     return Command.notYetImplemented(interaction);
   }
 
-  public async winner(interaction: CommandInteraction) {
-    return Command.notYetImplemented(interaction);
+  public async winner(interaction: CommandInteraction): Promise<void> {
+    const channel = interaction.options.getChannel('channel', true);
+    const winner = await this.pollService.getWinner(channel.id);
+    const content = winner
+      ? `${winner.url} with ${winner.voteCount} votes`
+      : `No votes have been cast in ${channel.name}`;
+    return interaction.reply({
+      content,
+      ephemeral: true,
+    });
   }
 
-  public async random(interaction: CommandInteraction) {
-    return Command.notYetImplemented(interaction);
+  public async random(interaction: CommandInteraction): Promise<void> {
+    const channel = interaction.options.getChannel('channel', true);
+    const winner = await this.pollService.getRandom(channel.id);
+    const content = winner
+      ? `${winner.url} with ${winner.voteCount} votes`
+      : `No submissions detected in ${channel.name}. Has polling been enabled?`;
+    return interaction.reply({
+      content,
+      ephemeral: true,
+    });
   }
-  public async shuffle(interaction: CommandInteraction) {
+
+  public async shuffle(interaction: CommandInteraction): Promise<void> {
     return Command.notYetImplemented(interaction);
   }
 }

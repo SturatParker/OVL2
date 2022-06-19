@@ -70,9 +70,7 @@ export class OVLClientService {
     ];
 
     events.forEach((handler: ClientEventHandler): void => {
-      this.client.on(handler.event, (...args) => {
-        void handler.callback(...args);
-      });
+      handler.registerClient(this.client);
     });
     return;
   }
@@ -83,18 +81,18 @@ export class OVLClientService {
       if (message.author.bot) return;
       switch (message.content) {
         case 'onReady':
-          this.readyHandler?.callback(message.client);
+          void this.readyHandler?.callback(message.client);
           break;
         case 'onError':
-          onError.callback(new Error(message.content));
+          void onError.callback(new Error(message.content));
           break;
         case 'onGuildMemberAdd':
           if (!message.member) return;
-          onGuildMemberAdd.callback(message.member);
+          void onGuildMemberAdd.callback(message.member);
           break;
         case 'onGuildMemberRemove':
           if (!message.member) return;
-          onGuildMemberRemove.callback(message.member);
+          void onGuildMemberRemove.callback(message.member);
           break;
       }
     });

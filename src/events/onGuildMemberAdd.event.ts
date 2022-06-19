@@ -35,9 +35,10 @@ export const logGuildMemberAdd: ClientEventCallback<'guildMemberAdd'> = async (
     footer: { text: `ID: ${guildMember.id}` },
   });
 
-  GuildUtils.log(guildMember.guild, { embeds: [embed] }).catch((err) =>
+  await GuildUtils.log(guildMember.guild, { embeds: [embed] }).catch((err) =>
     console.error(err)
   );
+  return;
 };
 
 export const onGuildMemberAdd: ClientEventHandler<'guildMemberAdd'> =

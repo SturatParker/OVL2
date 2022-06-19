@@ -7,6 +7,7 @@ export interface ISubmission {
   url: string;
   submittedBy: string;
   voterIds: string[];
+  voteCount?: number;
 }
 
 export class Submission implements ISubmission {

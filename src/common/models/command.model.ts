@@ -1,17 +1,12 @@
 import { APIMessage } from 'discord-api-types/v9';
 import {
-  ApplicationCommandSubCommandData,
-  ApplicationCommandSubGroupData,
   CommandInteraction,
   InteractionReplyOptions,
   Message,
 } from 'discord.js';
+import { CommandData } from '../types/CommandData.type';
 
-export class Command<
-  Data extends
-    | ApplicationCommandSubGroupData
-    | ApplicationCommandSubCommandData = any
-> {
+export class Command<Data extends CommandData = any> {
   constructor(
     public data: Data,
     private callback: (
@@ -41,8 +36,8 @@ export class Command<
       interaction.reply({ ...options, fetchReply: true });
   }
 
-  static async notYetImplemented(interaction: CommandInteraction) {
-    return await interaction.reply({
+  static notYetImplemented(interaction: CommandInteraction): Promise<void> {
+    return interaction.reply({
       content: 'Sorry, not yet implemented',
       ephemeral: true,
     });

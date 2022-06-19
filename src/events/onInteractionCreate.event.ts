@@ -6,13 +6,13 @@ import { PollCommand } from './../commands/poll/poll.command';
 
 export class CommandHandler extends ClientEventHandler<'interactionCreate'> {
   commands: Command[];
-  poll: Command;
+  poll: PollCommand;
   constructor(private pollService: PollService) {
     super(
       'interactionCreate',
       async (interaction: Interaction): Promise<void> => {
         if (!interaction.isCommand()) return;
-        this.commands
+        await this.commands
           .find((command) => command.name == interaction.commandName)
           ?.execute(interaction);
       }

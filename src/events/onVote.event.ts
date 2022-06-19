@@ -46,23 +46,28 @@ export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
           messageReaction
         );
 
-        // otherwise, record vote
-
-        if (rejectionReason) {
-          this.rejectVote(user, msgContent, rejectionReason);
-        } else {
-          const submission =
-            await this.submissionService.getSubmissionFromMessage(
-              messageReaction.message
-            );
-          this.submissionService.recordVote(submission, user.id);
-          this.acknowledgeVote(user, msgContent);
-        }
+        // set action
+        const action = rejectionReason
+          ? this.rejectVote(user, msgContent, rejectionReason)
+          : this.acceptVote(messageReaction.message, user, msgContent);
 
         // cleanup
-        messageReaction.remove();
+        await Promise.all([action, messageReaction.remove()]);
+        return;
       }
     );
+  }
+
+  private async acceptVote(
+    message: Message<true>,
+    user: User | PartialUser,
+    msgContent: string
+  ): Promise<Message> {
+    const submission = await this.submissionService.getSubmissionFromMessage(
+      message
+    );
+    await this.submissionService.recordVote(submission, user.id);
+    return this.acknowledgeVote(user, msgContent);
   }
 
   private async getRejectionReason(
