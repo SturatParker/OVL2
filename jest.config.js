@@ -6,4 +6,5 @@ module.exports = {
     'src/(.*)': '<rootDir>/src/$1',
     'tests/(.*)': '<rootDir>/__tests__/$1',
   },
+  modulePathIgnorePatterns: ['dist'],
 };
