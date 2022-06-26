@@ -42,7 +42,7 @@ export class Submission implements ISubmission {
     this.guildId = options.guildId;
     this.url = options.url;
     this.submittedById = options.submittedById;
-    this.voterIds = options.voterIds;
+    this.voterIds = [...options.voterIds];
   }
 
   public get hyperlink(): string {
@@ -66,8 +66,8 @@ export class Submission implements ISubmission {
     const artist = content.slice(0, yearIndex - 1);
 
     const year = parseInt(content.slice(yearIndex + 1, yearIndex + 5));
-    content = content.slice(content.indexOf(')'));
-    const regex = /^[\s]+|[\s]+$|\(|\)/g;
+    content = content.slice(yearIndex + 6);
+    const regex = /^[\s]+|[\s]+$|\(|\)|(?<=,)\s*/g;
     const genres = content.replace(regex, '').split(',');
 
     return new Submission({
