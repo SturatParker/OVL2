@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import { Collection, Db } from 'mongodb';
+import { Collection, Db, Filter } from 'mongodb';
 import { ISubmission, Submission } from 'src/common/models/submission.model';
 import { DatabaseService } from './databaseService.service';
 import { MongoService } from './mongoService.service';
@@ -14,22 +14,23 @@ export class SubmissionService extends DatabaseService<ISubmission> {
     this.collection = this.db.collection('Submissions');
   }
 
-  async getByVoterIds(
-    channelId: string,
-    userId: string
+  async getByVoter(
+    voterId: string,
+    guildId: string,
+    channelId?: string
   ): Promise<Submission[]> {
-    const submissions = await this.collection
-      .find({
-        channelId,
-        voterIds: [userId],
-      })
-      .toArray();
+    const filter: Filter<ISubmission> = {
+      guildId,
+      voterIds: [voterId],
+    };
+    if (channelId) filter.channelId = channelId;
+    const submissions = await this.collection.find(filter).toArray();
     return submissions.map((submission) => new Submission(submission));
   }
 
   async getBySubmitterIds(userId: string): Promise<Submission[]> {
     const submissions = await this.collection
-      .find({ submittedBy: userId })
+      .find({ submittedById: userId })
       .toArray();
     return submissions.map((submission) => new Submission(submission));
   }
@@ -39,11 +40,16 @@ export class SubmissionService extends DatabaseService<ISubmission> {
       { messageId: submission.messageId },
       {
         $set: {
+          rawContent: submission.rawContent,
+          album: submission.album,
+          artist: submission.artist,
+          year: submission.year,
+          genres: submission.genres,
           messageId: submission.messageId,
           channelId: submission.channelId,
           guildId: submission.guildId,
           url: submission.url,
-          submittedBy: submission.submittedBy,
+          submittedById: submission.submittedById,
         },
         $push: { voterIds: voterId },
         $inc: { voteCount: 1 },

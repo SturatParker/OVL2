@@ -6,7 +6,7 @@ import {
 } from 'discord.js';
 import { CommandData } from '../types/CommandData.type';
 
-export class Command<Data extends CommandData = any> {
+export abstract class Command<Data extends CommandData = any> {
   constructor(
     public data: Data,
     private callback: (

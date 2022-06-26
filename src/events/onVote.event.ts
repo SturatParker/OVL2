@@ -1,11 +1,4 @@
-import {
-  Message,
-  MessageEmbed,
-  MessageReaction,
-  PartialMessageReaction,
-  PartialUser,
-  User,
-} from 'discord.js';
+import { Message, MessageEmbed, PartialUser, User } from 'discord.js';
 import { Poll } from 'src/common/models/poll.model';
 import { ClientEventHandler } from 'src/common/types/ClientEventHandler.type';
 import { ColourUtils } from '../common/utils/ColourUtils';
@@ -43,7 +36,7 @@ export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
         const rejectionReason = await this.getRejectionReason(
           user,
           poll,
-          messageReaction
+          messageReaction.message
         );
 
         // set action
@@ -73,16 +66,17 @@ export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
   private async getRejectionReason(
     user: User | PartialUser,
     poll: Poll,
-    messageReaction: MessageReaction | PartialMessageReaction
+    message: Message<true>
   ): Promise<string | undefined> {
-    const existingVotes = await this.submissionService.getByVoterIds(
-      messageReaction.message.channelId,
-      user.id
+    const existingVotes = await this.submissionService.getByVoter(
+      user.id,
+      message.guildId,
+      message.channelId
     );
 
     // Check for voting for the same item twice
     const isDuplicateVote = existingVotes.some(
-      (submission) => submission.messageId == messageReaction.message.id
+      (submission) => submission.messageId == message.id
     );
     if (isDuplicateVote) return 'you have already voted for it';
 
@@ -92,11 +86,11 @@ export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
 
     // Check for voting for own submissions more than the max number of times
     const existingSelfVotes = existingVotes.filter(
-      (submission) => (submission.submittedBy = user.id)
+      (submission) => (submission.submittedById = user.id)
     );
     if (
       existingSelfVotes.length >= poll.maxSelfVotes &&
-      messageReaction.message.mentions.users.first()?.id == user.id
+      message.mentions.users.first()?.id == user.id
     )
       return `you have already cast the maximum number of votes for your own submissions: ${poll.maxSelfVotes}`;
     return;

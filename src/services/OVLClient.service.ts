@@ -1,4 +1,5 @@
 import { Client } from 'discord.js';
+import { Command } from 'src/common/models/command.model';
 import { ClientEventHandler } from 'src/common/types/ClientEventHandler.type';
 import {
   CommandHandler,
@@ -8,18 +9,22 @@ import {
   ReadyHandler,
   VoteHandler,
 } from 'src/events';
+import { MyVotesCommand } from './../commands/my-votes/my-votes.command';
+import { PollCommand } from './../commands/poll/poll.command';
 
 import { MongoService } from './database/mongoService.service';
 import { PollService } from './database/pollService.service';
 import { SubmissionService } from './database/submissionService.service';
 
 export class OVLClientService {
-  pollService?: PollService;
-  submissionService?: SubmissionService;
+  pollService: PollService;
+  submissionService: SubmissionService;
 
   readyHandler?: ReadyHandler;
   voteHandler?: VoteHandler;
   commandHandler?: CommandHandler;
+
+  commands: Command[] = [];
 
   constructor(private mongoService: MongoService, private client: Client) {
     this.pollService = new PollService(this.mongoService);
@@ -57,8 +62,14 @@ export class OVLClientService {
       this.pollService,
       this.submissionService
     );
-    this.commandHandler = new CommandHandler(this.pollService);
-    this.readyHandler = new ReadyHandler(this.commandHandler.commands);
+
+    this.commands.push(
+      new PollCommand(this.pollService),
+      new MyVotesCommand(this.submissionService)
+    );
+
+    this.commandHandler = new CommandHandler(this.commands);
+    this.readyHandler = new ReadyHandler(this.commands);
 
     const events: ClientEventHandler[] = [
       onError,

@@ -15,7 +15,8 @@
     "alwaysStrict": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    "strictPropertyInitialization": true
+    "strictPropertyInitialization": true,
+    "lib": ["ES2021.String"]
   },
   "ts-node": {
     "transpileOnly": true,
