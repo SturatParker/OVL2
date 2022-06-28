@@ -1,6 +1,8 @@
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord-api-types/v9';
 import { Client } from 'discord.js';
 import { Command } from 'src/common/models/command.model';
-import { ClientEventHandler } from 'src/common/types/ClientEventHandler.type';
+import { ClientEventHandler } from 'src/common/types/client-event-handler.type';
 import {
   CommandHandler,
   onError,
@@ -11,18 +13,19 @@ import {
 } from 'src/events';
 import { MyVotesCommand } from './../commands/my-votes/my-votes.command';
 import { PollCommand } from './../commands/poll/poll.command';
-
 import { MongoService } from './database/mongoService.service';
 import { PollService } from './database/pollService.service';
 import { SubmissionService } from './database/submissionService.service';
 
 export class OVLClientService {
+  private readonly homeGuildId = process.env.HOME_GUILD_ID;
+  private readonly discordToken = process.env.DISCORD_TOKEN;
   pollService: PollService;
   submissionService: SubmissionService;
 
   readyHandler?: ReadyHandler;
-  voteHandler?: VoteHandler;
-  commandHandler?: CommandHandler;
+  voteHandler: VoteHandler;
+  commandHandler: CommandHandler = new CommandHandler();
 
   commands: Command[] = [];
 
@@ -30,14 +33,35 @@ export class OVLClientService {
     this.pollService = new PollService(this.mongoService);
     this.submissionService = new SubmissionService(this.mongoService);
 
-    this.registerClientEvents();
-    this.registerDevTools();
+    this.voteHandler = new VoteHandler(
+      this.pollService,
+      this.submissionService
+    );
   }
 
   async start(): Promise<void> {
+    this.registerClientEvents();
+    this.registerDevTools();
     await this.startDatabase();
     await this.startClient();
+    await this.registerCommands();
     return;
+  }
+
+  private async registerCommands(): Promise<void> {
+    const clientId = this.client.user?.id;
+    if (!this.discordToken || !clientId || !this.homeGuildId) return;
+    console.log('Registering commands via REST');
+
+    const body = this.commands.map((command) => command.toJSON());
+    const rest = new REST({ version: '9' }).setToken(this.discordToken);
+    await rest.put(
+      Routes.applicationGuildCommands(clientId, this.homeGuildId),
+      {
+        body,
+      }
+    );
+    await rest.put(Routes.applicationCommands(clientId), { body: [] });
   }
 
   private async startDatabase(): Promise<void> {
@@ -57,18 +81,12 @@ export class OVLClientService {
   private registerClientEvents(): void {
     console.log('Registering client event handlers');
     if (!this.pollService || !this.submissionService) return;
-
-    this.voteHandler = new VoteHandler(
-      this.pollService,
-      this.submissionService
-    );
-
     this.commands.push(
       new PollCommand(this.pollService),
       new MyVotesCommand(this.submissionService)
     );
 
-    this.commandHandler = new CommandHandler(this.commands);
+    this.commandHandler.setCommands(...this.commands);
     this.readyHandler = new ReadyHandler(this.commands);
 
     const events: ClientEventHandler[] = [

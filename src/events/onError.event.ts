@@ -1,5 +1,5 @@
-import { ClientEventCallback } from 'src/common/types/ClientEventCallback.type';
-import { ClientEventHandler } from '../common/types/ClientEventHandler.type';
+import { ClientEventCallback } from 'src/common/types/client-event-callback.type';
+import { ClientEventHandler } from '../common/types/client-event-handler.type';
 
 const logError: ClientEventCallback<'error'> = (
   error: Error

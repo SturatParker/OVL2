@@ -1,6 +1,6 @@
 import { Client } from 'discord.js';
-import { ClientEvent as ClientEventTypes } from './ClientEvent.type';
-import { ClientEventCallback } from './ClientEventCallback.type';
+import { ClientEventCallback } from './client-event-callback.type';
+import { ClientEvent as ClientEventTypes } from './client-event.type';
 
 export class ClientEventHandler<E extends ClientEventTypes = any> {
   constructor(

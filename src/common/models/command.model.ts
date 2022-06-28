@@ -1,33 +1,22 @@
-import { APIMessage } from 'discord-api-types/v9';
+import {
+  APIMessage,
+  RESTPostAPIApplicationCommandsJSONBody,
+} from 'discord-api-types/v9';
 import {
   CommandInteraction,
   InteractionReplyOptions,
   Message,
 } from 'discord.js';
-import { CommandData } from '../types/CommandData.type';
+import { CommandDefinition } from '../types/command-definition.type';
 
-export abstract class Command<Data extends CommandData = any> {
-  constructor(
-    public data: Data,
-    private callback: (
-      this: Command<Data>,
-      interaction: CommandInteraction
-    ) => Promise<void>
-  ) {}
+export abstract class Command {
+  constructor(private data: CommandDefinition) {}
+
   get name(): string {
     return this.data.name;
   }
-  execute(interaction: CommandInteraction): Promise<void> {
-    return this.callback(interaction);
-  }
 
-  get isSubcommand(): boolean {
-    return this.data.type === 'SUB_COMMAND';
-  }
-
-  get isSubcommandGroup(): boolean {
-    return this.data.type === 'SUB_COMMAND_GROUP';
-  }
+  abstract execute(interaction: CommandInteraction): Promise<void>;
 
   getInteractionReplyFn(
     interaction: CommandInteraction
@@ -41,5 +30,9 @@ export abstract class Command<Data extends CommandData = any> {
       content: 'Sorry, not yet implemented',
       ephemeral: true,
     });
+  }
+
+  public toJSON(): RESTPostAPIApplicationCommandsJSONBody {
+    return this.data.toJSON();
   }
 }

@@ -1,33 +1,35 @@
-import { CommandInteraction } from 'discord.js';
+import { CacheType, CommandInteraction } from 'discord.js';
 import { Command } from '../../common/models/command.model';
 import { PollService } from '../../services/database/pollService.service';
-import { pollDefinition } from './poll.definition';
+import { poll } from './poll.definition';
 
-export class PollCommand extends Command<typeof pollDefinition> {
+export class PollCommand extends Command {
   constructor(private pollService: PollService) {
-    super(pollDefinition, async (interaction) => {
-      const options = interaction.options;
-      const subCommandName = options.getSubcommand();
+    super(poll);
+  }
 
-      switch (subCommandName) {
-        case 'set':
-          return this.set(interaction);
-        case 'unset':
-          return this.unset(interaction);
-        case 'open':
-          return this.open(interaction);
-        case 'close':
-          return this.close(interaction);
-        case 'winner':
-          return this.winner(interaction);
-        case 'random':
-          return this.random(interaction);
-        case 'shuffle':
-          return this.shuffle(interaction);
-        default:
-          return;
-      }
-    });
+  async execute(interaction: CommandInteraction<CacheType>): Promise<void> {
+    const options = interaction.options;
+    const subCommandName = options.getSubcommand();
+    switch (subCommandName) {
+      case 'set':
+        return this.set(interaction);
+      case 'unset':
+        return this.unset(interaction);
+      case 'open':
+        return this.open(interaction);
+      case 'close':
+        return this.close(interaction);
+      case 'winner':
+        return this.winner(interaction);
+      case 'random':
+        return this.random(interaction);
+      case 'shuffle':
+        return this.shuffle(interaction);
+      default:
+        break;
+    }
+    return;
   }
 
   public async set(interaction: CommandInteraction): Promise<void> {

@@ -1,4 +1,5 @@
 import {
+  CacheType,
   CommandInteraction,
   EmbedField,
   GuildBasedChannel,
@@ -7,18 +8,20 @@ import {
 import { Command } from 'src/common/models/command.model';
 import { ColourUtils } from 'src/common/utils/ColourUtils';
 import { SubmissionService } from 'src/services/database/submissionService.service';
-import { myvotesDefinition } from './my-votes.definition';
-export class MyVotesCommand extends Command<typeof myvotesDefinition> {
+import { myVotes } from './my-votes.definition';
+export class MyVotesCommand extends Command {
   constructor(private submissionService: SubmissionService) {
-    super(myvotesDefinition, async (interaction): Promise<void> => {
-      if (!interaction.inCachedGuild()) return;
-      const options = interaction.options;
-      const channel = options.getChannel('channel') ?? undefined;
+    super(myVotes);
+  }
 
-      const embed = await this.getEmbed(interaction, channel);
+  async execute(interaction: CommandInteraction<CacheType>): Promise<void> {
+    if (!interaction.inCachedGuild()) return;
+    const options = interaction.options;
+    const channel = options.getChannel('channel') ?? undefined;
 
-      await interaction.reply({ embeds: [embed], ephemeral: true });
-    });
+    const embed = await this.getEmbed(interaction, channel);
+
+    await interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
   private async getEmbed(

@@ -1,3 +1,4 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { ApplicationCommandData } from 'discord.js';
 
 export const myvotesDefinition: ApplicationCommandData = {
@@ -13,3 +14,10 @@ export const myvotesDefinition: ApplicationCommandData = {
     },
   ],
 };
+
+export const myVotes = new SlashCommandBuilder()
+  .setName('my_votes')
+  .setDescription('Who have I voted for?')
+  .addChannelOption((option) =>
+    option.setName('channel').setDescription('Channel')
+  );

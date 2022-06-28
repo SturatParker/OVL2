@@ -1,6 +1,6 @@
 import { Message, MessageEmbed, PartialUser, User } from 'discord.js';
 import { Poll } from 'src/common/models/poll.model';
-import { ClientEventHandler } from 'src/common/types/ClientEventHandler.type';
+import { ClientEventHandler } from 'src/common/types/client-event-handler.type';
 import { ColourUtils } from '../common/utils/ColourUtils';
 import { PollService } from '../services/database/pollService.service';
 import { SubmissionService } from '../services/database/submissionService.service';
