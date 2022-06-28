@@ -110,18 +110,18 @@ export class OVLClientService {
       if (message.author.bot) return;
       switch (message.content) {
         case 'onReady':
-          void this.readyHandler?.callback(message.client);
+          void this.readyHandler?.execute(message.client);
           break;
         case 'onError':
-          void onError.callback(new Error(message.content));
+          void onError.execute(new Error(message.content));
           break;
         case 'onGuildMemberAdd':
           if (!message.member) return;
-          void onGuildMemberAdd.callback(message.member);
+          void onGuildMemberAdd.execute(message.member);
           break;
         case 'onGuildMemberRemove':
           if (!message.member) return;
-          void onGuildMemberRemove.callback(message.member);
+          void onGuildMemberRemove.execute(message.member);
           break;
       }
     });

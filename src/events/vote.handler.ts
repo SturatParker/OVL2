@@ -1,4 +1,11 @@
-import { Message, MessageEmbed, PartialUser, User } from 'discord.js';
+import {
+  Message,
+  MessageEmbed,
+  MessageReaction,
+  PartialMessageReaction,
+  PartialUser,
+  User,
+} from 'discord.js';
 import { Poll } from 'src/common/models/poll.model';
 import { ClientEventHandler } from 'src/common/types/client-event-handler.type';
 import { ColourUtils } from '../common/utils/ColourUtils';
@@ -11,44 +18,41 @@ export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
     private pollService: PollService,
     private submissionService: SubmissionService
   ) {
-    super(
-      'messageReactionAdd',
-      async (messageReaction, user): Promise<void> => {
-        // Early return if not a vote attempt
-        if (!messageReaction.message.inGuild()) return;
-        const reactionEmoji = messageReaction.emoji.name;
-        if (!reactionEmoji) return;
-        if (!this.voteEmoji.includes(reactionEmoji)) return;
+    super('messageReactionAdd');
+  }
 
-        const poll = await this.pollService.getPoll(
-          messageReaction.message.channelId
-        );
-        if (!poll) return;
-        const message = messageReaction.message;
-        if (message.partial) await message.fetch();
-        console.log('Detected vote attempt:', messageReaction.message.content);
+  async execute(
+    reaction: MessageReaction | PartialMessageReaction,
+    user: User | PartialUser
+  ): Promise<void> {
+    // Early return if not a vote attempt
+    if (!reaction.message.inGuild()) return;
+    const reactionEmoji = reaction.emoji.name;
+    if (!reactionEmoji) return;
+    if (!this.voteEmoji.includes(reactionEmoji)) return;
 
-        const msgContent = messageReaction.message.content.replace(
-          /<@!?\d+>/g,
-          ''
-        );
+    const poll = await this.pollService.getPoll(reaction.message.channelId);
+    if (!poll) return;
+    const message = reaction.message;
+    if (message.partial) await message.fetch();
+    console.log('Detected vote attempt:', reaction.message.content);
 
-        const rejectionReason = await this.getRejectionReason(
-          user,
-          poll,
-          messageReaction.message
-        );
+    const msgContent = reaction.message.content.replace(/<@!?\d+>/g, '');
 
-        // set action
-        const action = rejectionReason
-          ? this.rejectVote(user, msgContent, rejectionReason)
-          : this.acceptVote(messageReaction.message, user, msgContent);
-
-        // cleanup
-        await Promise.all([action, messageReaction.remove()]);
-        return;
-      }
+    const rejectionReason = await this.getRejectionReason(
+      user,
+      poll,
+      reaction.message
     );
+
+    // set action
+    const action = rejectionReason
+      ? this.rejectVote(user, msgContent, rejectionReason)
+      : this.acceptVote(reaction.message, user, msgContent);
+
+    // cleanup
+    await Promise.all([action, reaction.remove()]);
+    return;
   }
 
   private async acceptVote(

@@ -72,19 +72,19 @@ export class PollCommand extends Command {
   }
 
   public async open(interaction: CommandInteraction): Promise<void> {
-    return Command.notYetImplemented(interaction);
+    return this.notYetImplemented(interaction);
   }
 
   public async close(interaction: CommandInteraction): Promise<void> {
-    return Command.notYetImplemented(interaction);
+    return this.notYetImplemented(interaction);
   }
 
   public async winner(interaction: CommandInteraction): Promise<void> {
     const channel = interaction.options.getChannel('channel', true);
     const winner = await this.pollService.getWinner(channel.id);
     const content = winner
-      ? `${winner.url} with ${winner.voteCount} votes`
-      : `No votes have been cast in ${channel.name}`;
+      ? `${winner.linkText} with ${winner.voteCount} votes`
+      : `No votes have been cast in <#${channel.id}>`;
     return interaction.reply({
       content,
       ephemeral: true,
@@ -104,6 +104,6 @@ export class PollCommand extends Command {
   }
 
   public async shuffle(interaction: CommandInteraction): Promise<void> {
-    return Command.notYetImplemented(interaction);
+    return this.notYetImplemented(interaction);
   }
 }

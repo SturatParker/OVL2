@@ -25,7 +25,7 @@ export abstract class Command {
       interaction.reply({ ...options, fetchReply: true });
   }
 
-  static notYetImplemented(interaction: CommandInteraction): Promise<void> {
+  protected notYetImplemented(interaction: CommandInteraction): Promise<void> {
     return interaction.reply({
       content: 'Sorry, not yet implemented',
       ephemeral: true,
