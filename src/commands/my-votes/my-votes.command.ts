@@ -7,7 +7,7 @@ import {
 } from 'discord.js';
 import { Command } from 'src/common/models/command.model';
 import { ColourUtils } from 'src/common/utils/ColourUtils';
-import { SubmissionService } from 'src/services/database/submissionService.service';
+import { SubmissionService } from 'src/services/database/submission.service';
 import { myVotes } from './my-votes.definition';
 export class MyVotesCommand extends Command {
   constructor(private submissionService: SubmissionService) {

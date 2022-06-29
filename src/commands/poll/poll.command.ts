@@ -1,6 +1,6 @@
 import { CacheType, CommandInteraction } from 'discord.js';
 import { Command } from '../../common/models/command.model';
-import { PollService } from '../../services/database/pollService.service';
+import { PollService } from '../../services/database/poll.service';
 import { poll } from './poll.definition';
 
 export class PollCommand extends Command {
@@ -41,6 +41,7 @@ export class PollCommand extends Command {
     const channel = interaction.options.getChannel('channel', true);
     const maxVotes = interaction.options.getInteger('max_votes', true);
     const maxSelfVotes = interaction.options.getInteger('max_self_votes', true);
+    const maxCancels = interaction.options.getInteger('max_cancels', true);
 
     let poll = await this.pollService.getPoll(channel.id);
     if (poll) {
@@ -55,6 +56,7 @@ export class PollCommand extends Command {
       isOpen: true,
       maxVotes,
       maxSelfVotes,
+      maxCancels,
     });
     return interaction.reply({
       content: `Created a new poll for ${channel.name}`,

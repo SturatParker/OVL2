@@ -1,5 +1,5 @@
 import { Collection, Db } from 'mongodb';
-import { MongoService } from './mongoService.service';
+import { MongoService } from './mongo.service';
 
 export abstract class DatabaseService<Model> {
   public abstract collection: Collection<Model>;

@@ -31,6 +31,12 @@ export const poll = new SlashCommandBuilder()
           )
           .setRequired(true)
       )
+      .addIntegerOption((option) =>
+        option
+          .setName('max_cancels')
+          .setDescription('Maximum number of times a member may cancel a vote')
+          .setRequired(true)
+      )
   )
   .addSubcommand((subCommand) =>
     subCommand

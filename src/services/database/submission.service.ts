@@ -1,8 +1,8 @@
 import { Message } from 'discord.js';
 import { Collection, Db, Filter } from 'mongodb';
 import { ISubmission, Submission } from 'src/common/models/submission.model';
-import { DatabaseService } from './databaseService.service';
-import { MongoService } from './mongoService.service';
+import { DatabaseService } from './database.service';
+import { MongoService } from './mongo.service';
 
 export class SubmissionService extends DatabaseService<ISubmission> {
   public collection: Collection<ISubmission>;
@@ -28,9 +28,12 @@ export class SubmissionService extends DatabaseService<ISubmission> {
     return submissions.map((submission) => new Submission(submission));
   }
 
-  async getBySubmitterIds(userId: string): Promise<Submission[]> {
+  async getBySubmitterIds(
+    userId: string,
+    channelId?: string
+  ): Promise<Submission[]> {
     const submissions = await this.collection
-      .find({ submittedById: userId })
+      .find({ submittedById: userId, channelId })
       .toArray();
     return submissions.map((submission) => new Submission(submission));
   }
@@ -57,6 +60,18 @@ export class SubmissionService extends DatabaseService<ISubmission> {
       { upsert: true }
     );
     return;
+  }
+
+  async cancelVote(messageId: string, userId: string): Promise<void> {
+    await this.collection.findOneAndUpdate(
+      { messageId },
+      {
+        $pull: { voterIds: userId },
+        $inc: {
+          voteCount: -1,
+        },
+      }
+    );
   }
 
   async getSubmissionFromMessage(message: Message<true>): Promise<Submission> {

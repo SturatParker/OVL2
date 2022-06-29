@@ -9,8 +9,8 @@ import {
 import { Poll } from 'src/common/models/poll.model';
 import { ClientEventHandler } from 'src/common/types/client-event-handler.type';
 import { ColourUtils } from '../common/utils/ColourUtils';
-import { PollService } from '../services/database/pollService.service';
-import { SubmissionService } from '../services/database/submissionService.service';
+import { PollService } from '../services/database/poll.service';
+import { SubmissionService } from '../services/database/submission.service';
 
 export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
   private voteEmoji = ['👍', '👍🏻', '👍🏼', '👍🏽', '👍🏾', '👍🏿'];

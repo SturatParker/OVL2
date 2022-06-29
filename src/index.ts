@@ -1,5 +1,5 @@
 import { Client, Intents } from 'discord.js';
-import { MongoService } from './services/database/mongoService.service';
+import { MongoService } from './services/database/mongo.service';
 import { OVLClientService } from './services/OVLClient.service';
 
 const mongoService = new MongoService();

@@ -1,11 +1,11 @@
 import { Collection, Db } from 'mongodb';
 import { IPoll, Poll } from 'src/common/models/poll.model';
 import { ISubmission, Submission } from 'src/common/models/submission.model';
-import { DatabaseService } from './databaseService.service';
-import { MongoService } from './mongoService.service';
+import { DatabaseService } from './database.service';
+import { MongoService } from './mongo.service';
 
-export class PollService extends DatabaseService<Poll> {
-  public collection: Collection<Poll>;
+export class PollService extends DatabaseService<IPoll> {
+  public collection: Collection<IPoll>;
   public db: Db;
   constructor(mongoService: MongoService) {
     super(mongoService);
@@ -14,8 +14,8 @@ export class PollService extends DatabaseService<Poll> {
   }
 
   public async createPoll(poll: IPoll): Promise<Poll> {
-    const response = await this.collection.insertOne(poll);
-    return new Poll({ ...poll, id: response.insertedId });
+    const result = await this.collection.insertOne(poll);
+    return new Poll({ ...poll, _id: result.insertedId });
   }
 
   public async getPoll(channelId: string): Promise<Poll | undefined> {

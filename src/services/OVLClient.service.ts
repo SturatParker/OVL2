@@ -8,34 +8,47 @@ import {
   onError,
   onGuildMemberAdd,
   onGuildMemberRemove,
-  ReadyHandler,
   VoteHandler,
 } from 'src/events';
+import { CancelVoteCommand } from './../commands/cancel-vote/cancel-vote.command';
 import { MyVotesCommand } from './../commands/my-votes/my-votes.command';
 import { PollCommand } from './../commands/poll/poll.command';
-import { MongoService } from './database/mongoService.service';
-import { PollService } from './database/pollService.service';
-import { SubmissionService } from './database/submissionService.service';
+import { onReady } from './../events/ready.handler';
+import { MongoService } from './database/mongo.service';
+import { PollService } from './database/poll.service';
+import { SubmissionService } from './database/submission.service';
+import { UserService } from './database/user.service';
 
 export class OVLClientService {
   private readonly homeGuildId = process.env.HOME_GUILD_ID;
   private readonly discordToken = process.env.DISCORD_TOKEN;
   pollService: PollService;
   submissionService: SubmissionService;
+  userService: UserService;
 
-  readyHandler?: ReadyHandler;
   voteHandler: VoteHandler;
   commandHandler: CommandHandler = new CommandHandler();
 
-  commands: Command[] = [];
+  private readonly commands: Command[] = [];
 
   constructor(private mongoService: MongoService, private client: Client) {
     this.pollService = new PollService(this.mongoService);
     this.submissionService = new SubmissionService(this.mongoService);
+    this.userService = new UserService(this.mongoService);
 
     this.voteHandler = new VoteHandler(
       this.pollService,
       this.submissionService
+    );
+
+    this.commands.push(
+      new PollCommand(this.pollService),
+      new MyVotesCommand(this.submissionService),
+      new CancelVoteCommand(
+        this.userService,
+        this.pollService,
+        this.submissionService
+      )
     );
   }
 
@@ -80,22 +93,15 @@ export class OVLClientService {
 
   private registerClientEvents(): void {
     console.log('Registering client event handlers');
-    if (!this.pollService || !this.submissionService) return;
-    this.commands.push(
-      new PollCommand(this.pollService),
-      new MyVotesCommand(this.submissionService)
-    );
 
     this.commandHandler.setCommands(...this.commands);
-    this.readyHandler = new ReadyHandler(this.commands);
-
     const events: ClientEventHandler[] = [
       onError,
       onGuildMemberAdd,
       onGuildMemberRemove,
+      onReady,
       this.voteHandler,
       this.commandHandler,
-      this.readyHandler,
     ];
 
     events.forEach((handler: ClientEventHandler): void => {
@@ -110,7 +116,7 @@ export class OVLClientService {
       if (message.author.bot) return;
       switch (message.content) {
         case 'onReady':
-          void this.readyHandler?.execute(message.client);
+          void onReady.execute(message.client);
           break;
         case 'onError':
           void onError.execute(new Error(message.content));
