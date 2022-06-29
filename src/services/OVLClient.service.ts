@@ -72,7 +72,7 @@ export class OVLClientService {
     if (EnvUtils.isProduction) {
       console.log(`Registering global commands via REST:`);
       console.group();
-      commandNames.forEach(console.log);
+      console.log(commandNames);
       console.groupEnd();
       await rest.put(Routes.applicationCommands(clientId), { body });
       return;
