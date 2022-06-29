@@ -9,7 +9,7 @@ import {
   MessageEmbed,
 } from 'discord.js';
 import { CommandDefinition } from '../types/command-definition.type';
-import { ColourUtils } from '../utils/ColourUtils';
+import { ColourUtils } from '../utils/colour.utils';
 
 export abstract class Command {
   constructor(private data: CommandDefinition) {}

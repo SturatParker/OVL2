@@ -1,6 +1,6 @@
 import { CommandInteraction, EmbedField, MessageEmbed } from 'discord.js';
 import { Command } from 'src/common/models/command.model';
-import { ColourUtils } from 'src/common/utils/ColourUtils';
+import { ColourUtils } from 'src/common/utils/colour.utils';
 import { PollService } from 'src/services/database/poll.service';
 import { SubmissionService } from 'src/services/database/submission.service';
 import { myVotes } from './my-votes.definition';
