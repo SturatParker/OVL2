@@ -1,16 +1,30 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId, WithId } from 'mongodb';
 
 export interface IPoll {
-  id?: ObjectId;
+  guildId: string;
   channelId: string;
+  isOpen: boolean;
+  maxVotes: number;
+  maxSelfVotes: number;
+  maxCancels: number;
 }
 
-export default class Poll implements IPoll {
-  id?: ObjectId;
+export class Poll implements IPoll {
+  _id: ObjectId;
+  guildId: string;
   channelId: string;
+  isOpen: boolean;
+  maxVotes: number;
+  maxSelfVotes: number;
+  maxCancels: number;
 
-  constructor(options: IPoll) {
-    this.id = options.id;
+  constructor(options: WithId<IPoll>) {
+    this._id = options._id;
+    this.guildId = options.guildId;
     this.channelId = options.channelId;
+    this.isOpen = options.isOpen;
+    this.maxVotes = options.maxVotes;
+    this.maxSelfVotes = options.maxSelfVotes;
+    this.maxCancels = options.maxCancels;
   }
 }

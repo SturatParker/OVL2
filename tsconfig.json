@@ -3,14 +3,20 @@
     "target": "ES5",
     "composite": true,
     "rootDir": ".",
-    "baseUrl": "src",
+    "baseUrl": ".",
     "outDir": "dist",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "paths": {
-      "src/*": ["./*"]
+      "src/*": ["src/*"]
     },
-    "plugins": [{ "transform": "typescript-transform-paths" }]
+    "plugins": [{ "transform": "typescript-transform-paths" }],
+    "strict": true,
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "strictPropertyInitialization": true,
+    "lib": ["ES2021.String"]
   },
   "ts-node": {
     "transpileOnly": true,
