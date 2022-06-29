@@ -43,7 +43,7 @@ export class OVLClientService {
 
     this.commands.push(
       new PollCommand(this.pollService),
-      new MyVotesCommand(this.submissionService),
+      new MyVotesCommand(this.pollService, this.submissionService),
       new CancelVoteCommand(
         this.userService,
         this.pollService,

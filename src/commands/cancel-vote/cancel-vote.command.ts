@@ -1,7 +1,5 @@
 import {
-  CacheType,
   CommandInteraction,
-  Message,
   MessageActionRow,
   MessageEmbed,
   MessageSelectMenu,
@@ -22,35 +20,44 @@ export class CancelVoteCommand extends Command {
   ) {
     super(cancelVote);
   }
-  async execute(interaction: CommandInteraction<CacheType>): Promise<void> {
+  async execute(interaction: CommandInteraction<'cached'>): Promise<void> {
     const channel = interaction.options.getChannel('channel', true);
-
     const [user, userVotes, poll] = await Promise.all([
       this.userService.getUser(interaction.user.id),
-      this.submissionService.getByVoter(interaction.user.id, channel.id),
+      this.submissionService.getByVoter(
+        interaction.user.id,
+        interaction.guildId,
+        channel.id
+      ),
       this.pollService.getPoll(channel.id),
     ]);
 
     if (!poll)
-      return interaction.reply({
-        content: 'That is not a poll channel',
-        ephemeral: true,
-      });
-    const max_values =
-      poll.maxCancels -
-      (user.cancellations.find((counter) => counter.pollId)?.count ?? 0);
-
-    if (max_values <= 0)
-      return interaction.reply({
-        content: 'You are out of cancellations in this round',
-        ephemeral: true,
-      });
+      return this.refuseCommand(
+        interaction,
+        `Polling is not enabled in <#${channel.id}>`
+      );
 
     if (!userVotes.length)
-      return interaction.reply({
-        content: 'You have not voted for anything yet!',
-        ephemeral: true,
-      });
+      return this.refuseCommand(
+        interaction,
+        `You have no votes cast in <#${channel.id}>`
+      );
+
+    if (!poll.maxCancels)
+      return this.refuseCommand(
+        interaction,
+        `Votes may not be cancelled in <#${channel.id}>`
+      );
+    const userCancelCount =
+      user.cancellations.find((counter) => counter.pollId)?.count ?? 0;
+    const userCancelsRemaining = poll.maxCancels - userCancelCount;
+
+    if (userCancelsRemaining <= 0)
+      return this.refuseCommand(
+        interaction,
+        `You have used all cancellations for <#${channel.id}> in this round: ${userCancelCount} of ${poll.maxCancels}`
+      );
 
     const options: MessageSelectOptionData[] = userVotes.map((submission) => ({
       label: submission.album,
@@ -62,7 +69,7 @@ export class CancelVoteCommand extends Command {
       new MessageSelectMenu({
         custom_id: 'select',
         min_values: 1,
-        max_values,
+        max_values: userCancelsRemaining,
         options,
         placeholder: 'Nothing selected',
       })
@@ -73,12 +80,12 @@ export class CancelVoteCommand extends Command {
       timestamp: new Date(),
     });
 
-    const message = (await interaction.reply({
+    const message = await interaction.reply({
       embeds: [embed],
       components: [row],
       ephemeral: true,
       fetchReply: true,
-    })) as Message<true>;
+    });
 
     const collector = message.createMessageComponentCollector({
       componentType: 'SELECT_MENU',
