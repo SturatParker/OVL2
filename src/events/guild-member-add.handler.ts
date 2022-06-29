@@ -1,8 +1,8 @@
 import { GuildMember, MessageEmbed } from 'discord.js';
 import { Period } from 'src/common/models/period.model';
 import { ClientEventHandler } from '../common/types/client-event-handler.type';
-import { ColourUtils } from '../common/utils/ColourUtils';
-import { GuildUtils } from '../common/utils/GuildUtils';
+import { ColourUtils } from '../common/utils/colour.utils';
+import { GuildUtils } from '../common/utils/guild.utils';
 
 export class GuildMemberAddHandler extends ClientEventHandler<'guildMemberAdd'> {
   constructor() {

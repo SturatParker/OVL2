@@ -1,4 +1,5 @@
 import { Client, Intents } from 'discord.js';
+import { EnvUtils } from './common/utils/env.utils';
 import { MongoService } from './services/database/mongo.service';
 import { OVLClientService } from './services/OVLClient.service';
 
@@ -17,4 +18,5 @@ const client = new Client({
 
 const ovlClient = new OVLClientService(mongoService, client);
 
+console.log('Production: ', EnvUtils.isProduction);
 void ovlClient.start();

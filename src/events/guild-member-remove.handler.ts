@@ -1,8 +1,8 @@
 import { GuildMember, MessageEmbed, PartialGuildMember } from 'discord.js';
 import { Period } from 'src/common/models/period.model';
 import { ClientEventHandler } from 'src/common/types/client-event-handler.type';
-import { ColourUtils } from 'src/common/utils/ColourUtils';
-import { GuildUtils } from 'src/common/utils/GuildUtils';
+import { ColourUtils } from 'src/common/utils/colour.utils';
+import { GuildUtils } from 'src/common/utils/guild.utils';
 
 export class GuildMemberRemoveHandler extends ClientEventHandler<'guildMemberRemove'> {
   constructor() {

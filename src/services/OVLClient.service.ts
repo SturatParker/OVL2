@@ -13,6 +13,7 @@ import {
 import { CancelVoteCommand } from './../commands/cancel-vote/cancel-vote.command';
 import { MyVotesCommand } from './../commands/my-votes/my-votes.command';
 import { PollCommand } from './../commands/poll/poll.command';
+import { EnvUtils } from './../common/utils/env.utils';
 import { onReady } from './../events/ready.handler';
 import { MongoService } from './database/mongo.service';
 import { PollService } from './database/poll.service';
@@ -54,27 +55,42 @@ export class OVLClientService {
 
   async start(): Promise<void> {
     this.registerClientEvents();
-    this.registerDevTools();
     await this.startDatabase();
     await this.startClient();
     await this.registerCommands();
+    console.log('Start up complete');
     return;
   }
 
   private async registerCommands(): Promise<void> {
     const clientId = this.client.user?.id;
-    if (!this.discordToken || !clientId || !this.homeGuildId) return;
-    console.log('Registering commands via REST');
-
+    if (!this.discordToken || !clientId) return;
     const body = this.commands.map((command) => command.toJSON());
     const rest = new REST({ version: '9' }).setToken(this.discordToken);
-    await rest.put(
-      Routes.applicationGuildCommands(clientId, this.homeGuildId),
-      {
-        body,
-      }
-    );
-    await rest.put(Routes.applicationCommands(clientId), { body: [] });
+    const commandNames = this.commands.map((command) => command.name);
+
+    if (EnvUtils.isProduction) {
+      console.log(`Registering global commands via REST:`);
+      console.group();
+      commandNames.forEach(console.log);
+      console.groupEnd();
+      await rest.put(Routes.applicationCommands(clientId), { body });
+      return;
+    }
+    if (this.homeGuildId) {
+      console.log(`Registering global commands via REST:`);
+      console.group();
+      console.log(commandNames);
+      console.groupEnd();
+      await rest.put(
+        Routes.applicationGuildCommands(clientId, this.homeGuildId),
+        {
+          body,
+        }
+      );
+      return;
+    }
+    console.log('Failed to register commands');
   }
 
   private async startDatabase(): Promise<void> {
@@ -92,7 +108,7 @@ export class OVLClientService {
   }
 
   private registerClientEvents(): void {
-    console.log('Registering client event handlers');
+    console.log('Registering client event handlers...');
 
     this.commandHandler.setCommands(...this.commands);
     const events: ClientEventHandler[] = [
@@ -106,30 +122,6 @@ export class OVLClientService {
 
     events.forEach((handler: ClientEventHandler): void => {
       handler.registerClient(this.client);
-    });
-    return;
-  }
-
-  private registerDevTools(): void {
-    if (process.env.NODE_ENV === 'production') return;
-    this.client.on('messageCreate', (message) => {
-      if (message.author.bot) return;
-      switch (message.content) {
-        case 'onReady':
-          void onReady.execute(message.client);
-          break;
-        case 'onError':
-          void onError.execute(new Error(message.content));
-          break;
-        case 'onGuildMemberAdd':
-          if (!message.member) return;
-          void onGuildMemberAdd.execute(message.member);
-          break;
-        case 'onGuildMemberRemove':
-          if (!message.member) return;
-          void onGuildMemberRemove.execute(message.member);
-          break;
-      }
     });
     return;
   }
