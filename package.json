@@ -9,6 +9,7 @@
     "serve": "node -r dotenv/config .",
     "preserve:production": "npm run build",
     "serve:production": "set NODE_ENV=production&& npm run serve",
+    "serve:production:linux": "NODE_ENV=production npm run serve",
     "dev": "ts-node-dev src/index.ts",
     "test": "jest --coverage"
   },
