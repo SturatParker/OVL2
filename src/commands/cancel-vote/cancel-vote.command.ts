@@ -27,20 +27,30 @@ export class CancelVoteCommand extends Command {
 
     const [user, userVotes, poll] = await Promise.all([
       this.userService.getUser(interaction.user.id),
-      this.submissionService.getBySubmitterIds(interaction.user.id, channel.id),
+      this.submissionService.getByVoter(interaction.user.id, channel.id),
       this.pollService.getPoll(channel.id),
     ]);
 
-    if (!poll) return interaction.reply('That is not a poll channel');
+    if (!poll)
+      return interaction.reply({
+        content: 'That is not a poll channel',
+        ephemeral: true,
+      });
     const max_values =
       poll.maxCancels -
       (user.cancellations.find((counter) => counter.pollId)?.count ?? 0);
 
     if (max_values <= 0)
-      return interaction.reply('You are out of cancellations in this round');
+      return interaction.reply({
+        content: 'You are out of cancellations in this round',
+        ephemeral: true,
+      });
 
     if (!userVotes.length)
-      return interaction.reply('You have not voted for anything yet!');
+      return interaction.reply({
+        content: 'You have not voted for anything yet!',
+        ephemeral: true,
+      });
 
     const options: MessageSelectOptionData[] = userVotes.map((submission) => ({
       label: submission.album,

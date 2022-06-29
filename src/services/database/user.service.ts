@@ -14,7 +14,7 @@ export class UserService extends DatabaseService<IUser> {
   }
 
   async getUser(userId: string): Promise<User> {
-    const document = await this.collection.findOne({ id: userId });
+    const document = await this.collection.findOne({ userId });
     if (document) return new User(document);
     const insert = { userId, cancellations: [] };
     const result = await this.collection.insertOne(insert);
@@ -26,10 +26,25 @@ export class UserService extends DatabaseService<IUser> {
     channelId: string,
     count = 1
   ): Promise<void> {
-    await this.collection.findOneAndUpdate(
-      { id: userId, 'cancellations.pollId': channelId },
-      { $inc: { 'cancellations.$.count': count } },
-      { upsert: true }
-    );
+    const user = await this.getUser(userId);
+    if (
+      user.cancellations.some(
+        (cancellation) => (cancellation.pollId = channelId)
+      )
+    ) {
+      await this.collection.updateOne(
+        { userId, 'cancellations.pollId': channelId },
+        { $inc: { 'cancellations.$.count': count } },
+        { upsert: true }
+      );
+    } else
+      await this.collection.updateOne(
+        { userId },
+        {
+          $push: {
+            cancellations: { pollId: channelId, count },
+          },
+        }
+      );
   }
 }
