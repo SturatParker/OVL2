@@ -36,14 +36,19 @@ export class PollService extends DatabaseService<IPoll> {
   }
 
   public async getWinner(channelId: string): Promise<Submission | undefined> {
+    const winners = await this.getTop(channelId, 1);
+    if (winners.length) return winners[0];
+    return;
+  }
+
+  public async getTop(channelId: string, count: number): Promise<Submission[]> {
     const winners = await this.db
       .collection<ISubmission>('Submissions')
       .find({ channelId })
       .sort({ voteCount: -1 })
-      .limit(1)
+      .limit(count)
       .toArray();
-    if (winners.length) return new Submission(winners[0]);
-    return;
+    return winners.map((sumission) => new Submission(sumission));
   }
 
   public async getRandom(channelId: string): Promise<Submission | undefined> {
