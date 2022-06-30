@@ -11,7 +11,8 @@
     "serve:production": "set NODE_ENV=production&& npm run serve",
     "serve:production:linux": "NODE_ENV=production npm run serve",
     "dev": "ts-node-dev src/index.ts",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "jasmine": "cross-env NODE_OPTIONS=--loader=ts-node/esm jasmine --config=jasmine.json"
   },
   "author": "",
   "license": "ISC",
@@ -24,12 +25,16 @@
     "mongodb": "^4.7.0"
   },
   "devDependencies": {
+    "@types/jasmine": "^4.0.3",
     "@types/jest": "^28.1.1",
     "@types/node": "^17.0.45",
     "@types/ws": "^8.5.3",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
+    "cross-env": "^7.0.3",
     "eslint-config-prettier": "^8.5.0",
+    "jasmine": "^4.2.1",
+    "jasmine-spec-reporter": "^7.0.0",
     "prettier": "^2.7.0",
     "ts-jest": "^28.0.5",
     "ts-node-dev": "^2.0.0",
