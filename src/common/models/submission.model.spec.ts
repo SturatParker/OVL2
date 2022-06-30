@@ -75,34 +75,68 @@ describe('Submission - Model', () => {
   });
   describe('static', () => {
     describe('fromMessage', () => {
-      const message = {
-        content: 'Album *by* Artist (2008) (Genre 1, Genre 2) <@123456>',
-        id: '123',
-        channelId: '234',
-        guildId: '345',
-        mentions: {
-          users: {
-            first(): { id: string } {
-              return { id: '456' };
+      it('should return a submission', () => {
+        const mmmm: DeepPartial<Message> = {};
+        const data = {
+          content: 'Album *by* Artist (2008) (Genre 1, Genre 2) <@123456>',
+          id: '123',
+          channelId: '234',
+          guildId: '345',
+          mentions: {
+            users: {
+              // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+              first: jasmine.createSpy('first').and.returnValue({ id: '123' }),
             },
           },
-        },
-        url: 'example.com',
-      };
-      target = Submission.fromMessage(message as Message<true>);
+          url: 'example.com',
+        };
 
-      expect(target).toBeTruthy();
-      expect(target.album).toEqual('Album');
-      expect(target.artist).toEqual('Artist');
-      expect(target.messageId).toEqual(message.id);
-      expect(target.channelId).toEqual(message.channelId);
-      expect(target.guildId).toEqual(message.guildId);
-      expect(target.submittedById).toEqual('456');
-      expect(target.genres).toEqual(['Genre 1', 'Genre 2']);
-      expect(target.rawContent).toEqual(message.content);
-      expect(target.url).toEqual(message.url);
-      expect(target.voterIds).toEqual([]);
-      expect(target.year).toEqual(2008);
+        const message: Message<true> = jasmine.createSpyObj<Message<true>>(
+          Message.name,
+          [],
+          ['mentions']
+        );
+
+        // const xxx = jasmine.createSpyObj<Message<boolean>>(
+        //   Message.name,
+        //   [],
+        //   {
+        //     mentions: jasmine.createSpyObj<MessageMentions>(
+        //       MessageMentions.name,
+        //       [],
+        //       {
+        //         users: jasmine.createSpyObj<Collection<string, User>>(
+        //           Collection.name,
+        //           {
+        //             first: [
+        //               jasmine.createSpyObj<User>(
+        //                 User.name,
+        //                 {},
+        //                 { id: '1234' } && undefined
+        //               ),
+        //             ],
+        //           }
+        //         ),
+        //       }
+        //     ),
+        //   } && 's'
+        // );
+        // spyOnProperty(message, 'mentions').and.returnValue(data.mentions);
+        spyOnProperty(message, 'mentions').and.returnValue(data.mentions);
+
+        expect(target).toBeTruthy();
+        expect(target.album).toEqual('Album');
+        expect(target.artist).toEqual('Artist');
+        expect(target.messageId).toEqual(message.id);
+        expect(target.channelId).toEqual(message.channelId);
+        expect(target.guildId).toEqual(message.guildId);
+        expect(target.submittedById).toEqual('456');
+        expect(target.genres).toEqual(['Genre 1', 'Genre 2']);
+        expect(target.rawContent).toEqual(message.content);
+        expect(target.url).toEqual(message.url);
+        expect(target.voterIds).toEqual([]);
+        expect(target.year).toEqual(2008);
+      });
     });
   });
 });
