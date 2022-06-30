@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import { ISubmission, Submission } from 'src/common/models/submission.model';
+import { mock } from 'test/deep-partial.type';
 
 describe('Submission - Model', () => {
   let target: Submission;
@@ -76,53 +77,22 @@ describe('Submission - Model', () => {
   describe('static', () => {
     describe('fromMessage', () => {
       it('should return a submission', () => {
-        const mmmm: DeepPartial<Message> = {};
-        const data = {
+        const message = mock<Message<true>>({
           content: 'Album *by* Artist (2008) (Genre 1, Genre 2) <@123456>',
           id: '123',
           channelId: '234',
           guildId: '345',
           mentions: {
             users: {
-              // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-              first: jasmine.createSpy('first').and.returnValue({ id: '123' }),
+              first() {
+                return { id: '456' };
+              },
             },
           },
           url: 'example.com',
-        };
+        });
 
-        const message: Message<true> = jasmine.createSpyObj<Message<true>>(
-          Message.name,
-          [],
-          ['mentions']
-        );
-
-        // const xxx = jasmine.createSpyObj<Message<boolean>>(
-        //   Message.name,
-        //   [],
-        //   {
-        //     mentions: jasmine.createSpyObj<MessageMentions>(
-        //       MessageMentions.name,
-        //       [],
-        //       {
-        //         users: jasmine.createSpyObj<Collection<string, User>>(
-        //           Collection.name,
-        //           {
-        //             first: [
-        //               jasmine.createSpyObj<User>(
-        //                 User.name,
-        //                 {},
-        //                 { id: '1234' } && undefined
-        //               ),
-        //             ],
-        //           }
-        //         ),
-        //       }
-        //     ),
-        //   } && 's'
-        // );
-        // spyOnProperty(message, 'mentions').and.returnValue(data.mentions);
-        spyOnProperty(message, 'mentions').and.returnValue(data.mentions);
+        target = Submission.fromMessage(message);
 
         expect(target).toBeTruthy();
         expect(target.album).toEqual('Album');
