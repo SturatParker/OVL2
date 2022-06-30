@@ -21,7 +21,7 @@ export class SubmissionService extends DatabaseService<ISubmission> {
   ): Promise<Submission[]> {
     const filter: Filter<ISubmission> = {
       guildId,
-      voterIds: [voterId],
+      voterIds: voterId,
     };
     if (channelId) filter.channelId = channelId;
     const submissions = await this.collection.find(filter).toArray();

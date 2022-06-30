@@ -57,18 +57,27 @@ export class Submission implements ISubmission {
   }
 
   static fromMessage(message: Message<true>): Submission {
-    let content = message.content.replace(/<@\d*>/, '');
-    const byDelim = ' *by* ';
-    const byIndex = content.indexOf(byDelim);
-    const album = content.slice(0, byIndex);
-    content = content.slice(byIndex + byDelim.length);
-    const yearIndex = content.search(/\(\d{4}\)/);
-    const artist = content.slice(0, yearIndex - 1);
+    let content = message.content;
 
-    const year = parseInt(content.slice(yearIndex + 1, yearIndex + 5));
-    content = content.slice(yearIndex + 6);
-    const regex = /^[\s]+|[\s]+$|\(|\)|(?<=,)\s*/g;
-    const genres = content.replace(regex, '').split(',');
+    const mentionRegex = /<@!?\d+>/;
+    const byRegex = / \*by\* | _by_ /;
+    const yearRegex = /\(\d{4}\)/;
+    const genreBracketRegex = /^[\s]+|[\s]+$|\(|\)|(?<=,)\s*/g;
+    content = content.replace(mentionRegex, '');
+
+    // get album
+    const byIndex = content.search(byRegex);
+    const album = content.slice(0, byIndex);
+    content = content.slice(byIndex + 6);
+    // get artist
+    const yearIndex = content.search(yearRegex);
+    const artist = content.slice(0, yearIndex - 1);
+    content = content.slice(yearIndex);
+    // get year
+    const year = parseInt(content.slice(1, yearIndex + 5));
+    content = content.slice(6);
+    // get genres
+    const genres = content.replace(genreBracketRegex, '').split(',');
 
     return new Submission({
       rawContent: message.content,

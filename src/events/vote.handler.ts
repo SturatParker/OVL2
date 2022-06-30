@@ -7,6 +7,7 @@ import {
   User,
 } from 'discord.js';
 import { Poll } from 'src/common/models/poll.model';
+import { Submission } from 'src/common/models/submission.model';
 import { ClientEventHandler } from 'src/common/types/client-event-handler.type';
 import { ColourUtils } from '../common/utils/colour.utils';
 import { PollService } from '../services/database/poll.service';
@@ -25,30 +26,37 @@ export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
     reaction: MessageReaction | PartialMessageReaction,
     user: User | PartialUser
   ): Promise<void> {
-    // Early return if not a vote attempt
+    // Check the reaction was in a poll channel
     if (!reaction.message.inGuild()) return;
     const reactionEmoji = reaction.emoji.name;
     if (!reactionEmoji) return;
     if (!this.voteEmoji.includes(reactionEmoji)) return;
+    const { channelId, guildId } = reaction.message;
+    const [poll, existingVotes] = await Promise.all([
+      this.pollService.getPoll(channelId),
+      this.submissionService.getByVoter(user.id, guildId, channelId),
+    ]);
 
-    const poll = await this.pollService.getPoll(reaction.message.channelId);
     if (!poll) return;
+
+    // Check the vote is valid
     const message = reaction.message;
     if (message.partial) await message.fetch();
-    console.log('Detected vote attempt:', reaction.message.content);
+    console.log('Detected vote attempt:', message.content);
 
-    const msgContent = reaction.message.content.replace(/<@!?\d+>/g, '');
+    const submission = Submission.fromMessage(message);
 
-    const rejectionReason = await this.getRejectionReason(
+    const rejectionReason = this.getRejectionReason(
       user,
       poll,
-      reaction.message
+      submission,
+      existingVotes
     );
 
     // set action
     const action = rejectionReason
-      ? this.rejectVote(user, msgContent, rejectionReason)
-      : this.acceptVote(reaction.message, user, msgContent);
+      ? this.rejectVote(user, submission, rejectionReason)
+      : this.acceptVote(user, submission);
 
     // cleanup
     await Promise.all([action, reaction.remove()]);
@@ -56,31 +64,22 @@ export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
   }
 
   private async acceptVote(
-    message: Message<true>,
     user: User | PartialUser,
-    msgContent: string
+    submission: Submission
   ): Promise<Message> {
-    const submission = await this.submissionService.getSubmissionFromMessage(
-      message
-    );
     await this.submissionService.recordVote(submission, user.id);
-    return this.acknowledgeVote(user, msgContent);
+    return this.acknowledgeVote(user, submission.rawContent);
   }
 
-  private async getRejectionReason(
+  private getRejectionReason(
     user: User | PartialUser,
     poll: Poll,
-    message: Message<true>
-  ): Promise<string | undefined> {
-    const existingVotes = await this.submissionService.getByVoter(
-      user.id,
-      message.guildId,
-      message.channelId
-    );
-
+    submission: Submission,
+    existingVotes: Submission[]
+  ): string | undefined {
     // Check for voting for the same item twice
     const isDuplicateVote = existingVotes.some(
-      (submission) => submission.messageId == message.id
+      (vote) => vote.messageId == submission.messageId
     );
     if (isDuplicateVote) return 'you have already voted for it';
 
@@ -90,11 +89,11 @@ export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
 
     // Check for voting for own submissions more than the max number of times
     const existingSelfVotes = existingVotes.filter(
-      (submission) => (submission.submittedById = user.id)
+      (vote) => vote.submittedById == user.id
     );
     if (
       existingSelfVotes.length >= poll.maxSelfVotes &&
-      message.mentions.users.first()?.id == user.id
+      submission.submittedById == user.id
     )
       return `you have already cast the maximum number of votes for your own submissions: ${poll.maxSelfVotes}`;
     return;
@@ -113,15 +112,20 @@ export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
 
   private async rejectVote(
     user: User | PartialUser,
-    voteMessage: string,
+    submission: Submission,
     reason: string
   ): Promise<Message> {
+    console.log(
+      `Rejected ${user.username ?? ''}'s vote for ${
+        submission.rawContent
+      }. Reason: ${reason}`
+    );
     const embed = new MessageEmbed()
       .setTitle('Vote failed')
       .setDescription(
-        `We couldn't register your vote for ***${voteMessage}*** because ${
-          reason || 'unspecified reason'
-        }`
+        `We couldn't register your vote for ***${
+          submission.rawContent
+        }*** because ${reason || 'unspecified reason'}`
       )
       .setColor(ColourUtils.error);
     return user.send({ embeds: [embed] });

@@ -69,7 +69,7 @@ export class CancelVoteCommand extends Command {
       new MessageSelectMenu({
         custom_id: 'select',
         min_values: 1,
-        max_values: userCancelsRemaining,
+        max_values: Math.min(userCancelsRemaining, options.length),
         options,
         placeholder: 'Nothing selected',
       })
