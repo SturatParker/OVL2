@@ -59,19 +59,17 @@ export class CancelVoteCommand extends Command {
         `You have used all cancellations for <#${channel.id}> in this round: ${userCancelCount} of ${poll.maxCancels}`
       );
 
-    const options: MessageSelectOptionData[] = userVotes
-      .map((submission) => ({
-        label: submission.album,
-        description: `by ${submission.artist}`,
-        value: submission.messageId,
-      }))
-      .slice(0, 20);
+    const options: MessageSelectOptionData[] = userVotes.map((submission) => ({
+      label: submission.album,
+      description: `by ${submission.artist}`,
+      value: submission.messageId,
+    }));
 
     const row = new MessageActionRow().addComponents(
       new MessageSelectMenu({
         custom_id: 'select',
         min_values: 1,
-        max_values: Math.min(25, userCancelsRemaining),
+        max_values: Math.min(userCancelsRemaining, options.length),
         options,
         placeholder: 'Nothing selected',
       })
