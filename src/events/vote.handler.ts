@@ -77,6 +77,10 @@ export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
     submission: Submission,
     existingVotes: Submission[]
   ): string | undefined {
+    console.log(user);
+    console.log(poll);
+    console.log(submission);
+    console.log(existingVotes);
     // Check for voting for the same item twice
     const isDuplicateVote = existingVotes.some(
       (vote) => vote.messageId == submission.messageId
