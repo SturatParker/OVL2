@@ -77,10 +77,6 @@ export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
     submission: Submission,
     existingVotes: Submission[]
   ): string | undefined {
-    console.log(user);
-    console.log(poll);
-    console.log(submission);
-    console.log(existingVotes);
     // Check for voting for the same item twice
     const isDuplicateVote = existingVotes.some(
       (vote) => vote.messageId == submission.messageId
@@ -120,7 +116,9 @@ export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
     reason: string
   ): Promise<Message> {
     console.log(
-      `Rejected ${user.username}'s vote for ${submission.rawContent}. Reason: ${reason}`
+      `Rejected ${user.username ?? ''}'s vote for ${
+        submission.rawContent
+      }. Reason: ${reason}`
     );
     const embed = new MessageEmbed()
       .setTitle('Vote failed')
