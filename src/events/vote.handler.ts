@@ -89,7 +89,7 @@ export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
 
     // Check for voting for own submissions more than the max number of times
     const existingSelfVotes = existingVotes.filter(
-      (vote) => (vote.submittedById = user.id)
+      (vote) => vote.submittedById == user.id
     );
     if (
       existingSelfVotes.length >= poll.maxSelfVotes &&
