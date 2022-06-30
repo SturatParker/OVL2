@@ -92,7 +92,9 @@ export class PollCommand extends Command {
         : top
             .map(
               (submission, index) =>
-                `${index}: ${submission.linkText} with ${submission.voteCount} votes`
+                `${index + 1}: ${submission.linkText} with ${
+                  submission.voteCount
+                } votes`
             )
             .join('\n');
     } else {
