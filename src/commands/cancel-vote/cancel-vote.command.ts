@@ -59,11 +59,13 @@ export class CancelVoteCommand extends Command {
         `You have used all cancellations for <#${channel.id}> in this round: ${userCancelCount} of ${poll.maxCancels}`
       );
 
-    const options: MessageSelectOptionData[] = userVotes.map((submission) => ({
-      label: submission.album,
-      description: `by ${submission.artist}`,
-      value: submission.messageId,
-    }));
+    const options: MessageSelectOptionData[] = userVotes
+      .map((submission) => ({
+        label: submission.album,
+        description: `by ${submission.artist}`,
+        value: submission.messageId,
+      }))
+      .slice(0, 20);
 
     const row = new MessageActionRow().addComponents(
       new MessageSelectMenu({
