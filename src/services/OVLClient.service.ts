@@ -1,6 +1,6 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
-import { Client } from 'discord.js';
+import { Client, Message } from 'discord.js';
 import { Command } from 'src/common/models/command.model';
 import { ClientEventHandler } from 'src/common/types/client-event-handler.type';
 import {
@@ -19,6 +19,7 @@ import { MongoService } from './database/mongo.service';
 import { PollService } from './database/poll.service';
 import { SubmissionService } from './database/submission.service';
 import { UserService } from './database/user.service';
+import { scopeEval } from './scopeEval';
 
 export class OVLClientService {
   private readonly homeGuildId = process.env.HOME_GUILD_ID;
@@ -120,9 +121,25 @@ export class OVLClientService {
       this.commandHandler,
     ];
 
+    this.devTool();
+
     events.forEach((handler: ClientEventHandler): void => {
       handler.registerClient(this.client);
     });
     return;
+  }
+
+  private devTool(): void {
+    this.client.on('messageCreate', (message: Message) => {
+      if (message.author.id !== '172057502547050496') return;
+      if (message.content.startsWith('!eval')) {
+        const payload = message.content.split(' ').slice(1).join('');
+        try {
+          console.log(scopeEval(this, payload));
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    });
   }
 }
