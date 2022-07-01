@@ -83,13 +83,28 @@ export class PollCommand extends Command {
 
   public async winner(interaction: CommandInteraction): Promise<void> {
     const channel = interaction.options.getChannel('channel', true);
-    const winner = await this.pollService.getWinner(channel.id);
-    const content = winner
-      ? `${winner.linkText} with ${winner.voteCount} votes`
-      : `No votes have been cast in <#${channel.id}>`;
+    const top_n = interaction.options.getInteger('top_n');
+    let content: string;
+    if (top_n) {
+      const top = await this.pollService.getTop(channel.id, top_n);
+      content = !top.length
+        ? `No votes have been cast in <#${channel.id}>`
+        : top
+            .map(
+              (submission, index) =>
+                `${index + 1}: ${submission.linkText} with ${
+                  submission.voteCount
+                } votes`
+            )
+            .join('\n');
+    } else {
+      const winner = await this.pollService.getWinner(channel.id);
+      content = !winner
+        ? `No votes have been cast in <#${channel.id}>`
+        : `${winner.linkText} with ${winner.voteCount} votes`;
+    }
     return interaction.reply({
       content,
-      ephemeral: true,
     });
   }
 

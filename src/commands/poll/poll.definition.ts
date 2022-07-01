@@ -77,6 +77,12 @@ export const poll = new SlashCommandBuilder()
       .addChannelOption((option) =>
         option.setName('channel').setDescription('Channel').setRequired(true)
       )
+      .addIntegerOption((option) =>
+        option
+          .setName('top_n')
+          .setDescription('Include the top N entries')
+          .setMinValue(1)
+      )
   )
   .addSubcommand((subCommand) =>
     subCommand
