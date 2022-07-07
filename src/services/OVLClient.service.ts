@@ -1,7 +1,7 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { Client, Message } from 'discord.js';
-import { Command } from 'src/common/models/command.model';
+import { Command } from 'src/common/core/command.abstract';
 import { ClientEventHandler } from 'src/common/types/client-event-handler.type';
 import {
   CommandHandler,

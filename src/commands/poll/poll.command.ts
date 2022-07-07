@@ -1,5 +1,9 @@
-import { CacheType, CommandInteraction } from 'discord.js';
-import { Command } from '../../common/models/command.model';
+import { CommandInteraction, EmbedFieldData, MessageEmbed } from 'discord.js';
+import { Submission } from 'src/common/models/submission.model';
+import { ColourUtils } from 'src/common/utils/colour.utils';
+import { Mention } from 'src/common/utils/mention.utils';
+import { Command } from '../../common/core/command.abstract';
+import { FieldPaginatorRow } from '../../common/core/field-paginator-row';
 import { PollService } from '../../services/database/poll.service';
 import { poll } from './poll.definition';
 
@@ -8,7 +12,7 @@ export class PollCommand extends Command {
     super(poll);
   }
 
-  async execute(interaction: CommandInteraction<CacheType>): Promise<void> {
+  async execute(interaction: CommandInteraction<'cached'>): Promise<void> {
     const options = interaction.options;
     const subCommandName = options.getSubcommand();
     switch (subCommandName) {
@@ -81,31 +85,56 @@ export class PollCommand extends Command {
     return this.notYetImplemented(interaction);
   }
 
-  public async winner(interaction: CommandInteraction): Promise<void> {
+  public async winner(
+    interaction: CommandInteraction<'cached'>
+  ): Promise<void> {
     const channel = interaction.options.getChannel('channel', true);
     const top_n = interaction.options.getInteger('top_n');
-    let content: string;
-    if (top_n) {
-      const top = await this.pollService.getTop(channel.id, top_n);
-      content = !top.length
-        ? `No votes have been cast in <#${channel.id}>`
-        : top
-            .map(
-              (submission, index) =>
-                `${index + 1}: ${submission.linkText} with ${
-                  submission.voteCount
-                } votes`
-            )
-            .join('\n');
-    } else {
-      const winner = await this.pollService.getWinner(channel.id);
-      content = !winner
-        ? `No votes have been cast in <#${channel.id}>`
-        : `${winner.linkText} with ${winner.voteCount} votes`;
+
+    const submissions: Submission[] = await this.pollService.getTop(
+      channel.id,
+      top_n ?? 1
+    );
+
+    if (!submissions.length) {
+      return this.refuseCommand(
+        interaction,
+        `No votes have been cast in ${Mention.channel(channel)}`
+      );
     }
-    return interaction.reply({
-      content,
+
+    const allFields: EmbedFieldData[] = submissions.map((submission, index) => {
+      return {
+        name: String(index),
+        value: `${index + 1}: ${submission.linkText} with ${
+          submission.voteCount
+        } votes`,
+      };
     });
+
+    const paginator = new FieldPaginatorRow(allFields);
+
+    const embed = new MessageEmbed({
+      title: 'Poll winners',
+      color: ColourUtils.success,
+      timestamp: new Date(),
+      description: `Poll data for ${Mention.channel(channel)}`,
+      fields: paginator.currentFields(),
+    });
+
+    if (!paginator.canNext) {
+      return interaction.reply({
+        embeds: [embed],
+      });
+    }
+
+    const reply = await interaction.reply({
+      embeds: [embed],
+      components: [paginator],
+      fetchReply: true,
+    });
+
+    paginator.collect(interaction, reply);
   }
 
   public async random(interaction: CommandInteraction): Promise<void> {
