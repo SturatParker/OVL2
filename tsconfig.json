@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "ES6",
+    "moduleResolution": "node",
     "composite": true,
     "rootDir": ".",
     "baseUrl": ".",

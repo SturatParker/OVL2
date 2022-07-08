@@ -1,9 +1,10 @@
 import { CommandInteraction, EmbedFieldData, MessageEmbed } from 'discord.js';
+import { PaginatedFieldReply } from 'src/common/core/paginatied-field-reply';
 import { Submission } from 'src/common/models/submission.model';
 import { ColourUtils } from 'src/common/utils/colour.utils';
 import { Mention } from 'src/common/utils/mention.utils';
+import { Numeric } from 'src/common/utils/numeric.utils';
 import { Command } from '../../common/core/command.abstract';
-import { FieldPaginatorRow } from '../../common/core/field-paginator-row';
 import { PollService } from '../../services/database/poll.service';
 import { poll } from './poll.definition';
 
@@ -103,38 +104,23 @@ export class PollCommand extends Command {
       );
     }
 
-    const allFields: EmbedFieldData[] = submissions.map((submission, index) => {
+    const fields: EmbedFieldData[] = submissions.map((submission, index) => {
       return {
-        name: String(index),
-        value: `${index + 1}: ${submission.linkText} with ${
-          submission.voteCount
-        } votes`,
+        name: `${Numeric.toMedal(index + 1)}: ${submission.album}`,
+        value: `${submission.hyperlink} by ${submission.artist} with ${submission.voteCount} votes`,
       };
     });
-
-    const paginator = new FieldPaginatorRow(allFields);
 
     const embed = new MessageEmbed({
       title: 'Poll winners',
       color: ColourUtils.success,
       timestamp: new Date(),
       description: `Poll data for ${Mention.channel(channel)}`,
-      fields: paginator.currentFields(),
+      fields,
     });
+    const reply = new PaginatedFieldReply(embed, interaction, false);
 
-    if (!paginator.canNext) {
-      return interaction.reply({
-        embeds: [embed],
-      });
-    }
-
-    const reply = await interaction.reply({
-      embeds: [embed],
-      components: [paginator],
-      fetchReply: true,
-    });
-
-    paginator.collect(interaction, reply);
+    await reply.send();
   }
 
   public async random(interaction: CommandInteraction): Promise<void> {
