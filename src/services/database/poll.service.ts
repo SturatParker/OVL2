@@ -41,6 +41,17 @@ export class PollService extends DatabaseService<IPoll> {
     return;
   }
 
+  public async addVotes(channelId: string, quantity = 1): Promise<void> {
+    await this.collection.updateOne(
+      { channelId },
+      { $inc: { voteCount: quantity } }
+    );
+  }
+
+  public async removeVotes(channelId: string, quantity = 1): Promise<void> {
+    return this.addVotes(channelId, 0 - quantity);
+  }
+
   public async getTop(channelId: string, count: number): Promise<Submission[]> {
     const winners = await this.db
       .collection<ISubmission>('Submissions')

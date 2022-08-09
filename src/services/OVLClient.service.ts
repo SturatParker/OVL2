@@ -1,7 +1,7 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { Client, Message } from 'discord.js';
-import { Command } from 'src/common/models/command.model';
+import { Command } from 'src/common/core/command.abstract';
 import { ClientEventHandler } from 'src/common/types/client-event-handler.type';
 import {
   CommandHandler,
@@ -10,9 +10,9 @@ import {
   onGuildMemberRemove,
   VoteHandler,
 } from 'src/events';
+import { PollCommand } from '../commands/poll/poll-command';
 import { CancelVoteCommand } from './../commands/cancel-vote/cancel-vote.command';
 import { MyVotesCommand } from './../commands/my-votes/my-votes.command';
-import { PollCommand } from './../commands/poll/poll.command';
 import { EnvUtils } from './../common/utils/env.utils';
 import { onReady } from './../events/ready.handler';
 import { MongoService } from './database/mongo.service';

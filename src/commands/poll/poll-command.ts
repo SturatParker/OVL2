@@ -1,14 +1,16 @@
-import { CacheType, CommandInteraction } from 'discord.js';
-import { Command } from '../../common/models/command.model';
+import { CommandInteraction } from 'discord.js';
+import { Command } from '../../common/core/command.abstract';
 import { PollService } from '../../services/database/poll.service';
-import { poll } from './poll.definition';
+import { poll } from './poll-command.definition';
+import { PollWinnerSubcommand } from './subcommands/poll-winner-subcommand';
 
 export class PollCommand extends Command {
+  private pollWinner = new PollWinnerSubcommand(this.pollService);
   constructor(private pollService: PollService) {
     super(poll);
   }
 
-  async execute(interaction: CommandInteraction<CacheType>): Promise<void> {
+  async execute(interaction: CommandInteraction<'cached'>): Promise<void> {
     const options = interaction.options;
     const subCommandName = options.getSubcommand();
     switch (subCommandName) {
@@ -21,7 +23,7 @@ export class PollCommand extends Command {
       case 'close':
         return this.close(interaction);
       case 'winner':
-        return this.winner(interaction);
+        return this.pollWinner.execute(interaction);
       case 'random':
         return this.random(interaction);
       case 'shuffle':
@@ -79,33 +81,6 @@ export class PollCommand extends Command {
 
   public async close(interaction: CommandInteraction): Promise<void> {
     return this.notYetImplemented(interaction);
-  }
-
-  public async winner(interaction: CommandInteraction): Promise<void> {
-    const channel = interaction.options.getChannel('channel', true);
-    const top_n = interaction.options.getInteger('top_n');
-    let content: string;
-    if (top_n) {
-      const top = await this.pollService.getTop(channel.id, top_n);
-      content = !top.length
-        ? `No votes have been cast in <#${channel.id}>`
-        : top
-            .map(
-              (submission, index) =>
-                `${index + 1}: ${submission.linkText} with ${
-                  submission.voteCount
-                } votes`
-            )
-            .join('\n');
-    } else {
-      const winner = await this.pollService.getWinner(channel.id);
-      content = !winner
-        ? `No votes have been cast in <#${channel.id}>`
-        : `${winner.linkText} with ${winner.voteCount} votes`;
-    }
-    return interaction.reply({
-      content,
-    });
   }
 
   public async random(interaction: CommandInteraction): Promise<void> {

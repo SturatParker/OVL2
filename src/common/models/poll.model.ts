@@ -7,6 +7,7 @@ export interface IPoll {
   maxVotes: number;
   maxSelfVotes: number;
   maxCancels: number;
+  voteCount?: number;
 }
 
 export class Poll implements IPoll {
@@ -17,6 +18,7 @@ export class Poll implements IPoll {
   maxVotes: number;
   maxSelfVotes: number;
   maxCancels: number;
+  voteCount: number;
 
   constructor(options: WithId<IPoll>) {
     this._id = options._id;
@@ -26,5 +28,6 @@ export class Poll implements IPoll {
     this.maxVotes = options.maxVotes;
     this.maxSelfVotes = options.maxSelfVotes;
     this.maxCancels = options.maxCancels;
+    this.voteCount = options.voteCount ?? 0;
   }
 }
