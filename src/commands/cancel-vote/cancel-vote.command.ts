@@ -100,6 +100,7 @@ export class CancelVoteCommand extends Command {
           channel.id,
           collected.values.length
         ),
+        this.pollService.removeVotes(channel.id, collected.values.length),
         ...collected.values.map((value) =>
           this.submissionService.cancelVote(value, user.userId)
         ),

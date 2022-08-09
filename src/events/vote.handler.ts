@@ -67,7 +67,10 @@ export class VoteHandler extends ClientEventHandler<'messageReactionAdd'> {
     user: User | PartialUser,
     submission: Submission
   ): Promise<Message> {
-    await this.submissionService.recordVote(submission, user.id);
+    await Promise.all([
+      this.submissionService.recordVote(submission, user.id),
+      this.pollService.addVotes(submission.channelId),
+    ]);
     return this.acknowledgeVote(user, submission.rawContent);
   }
 
