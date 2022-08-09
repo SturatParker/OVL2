@@ -10,9 +10,9 @@ import {
   onGuildMemberRemove,
   VoteHandler,
 } from 'src/events';
+import { PollCommand } from '../commands/poll/poll-command';
 import { CancelVoteCommand } from './../commands/cancel-vote/cancel-vote.command';
 import { MyVotesCommand } from './../commands/my-votes/my-votes.command';
-import { PollCommand } from './../commands/poll/poll.command';
 import { EnvUtils } from './../common/utils/env.utils';
 import { onReady } from './../events/ready.handler';
 import { MongoService } from './database/mongo.service';
