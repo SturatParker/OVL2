@@ -42,24 +42,10 @@ export class PaginatedFieldReply implements InteractionReplyOptions {
   }
 
   collectFrom(reply: Message<true>): void {
-    const collector = reply.createMessageComponentCollector({
-      componentType: 'BUTTON',
-      time: 120000,
-      filter: (collected) =>
-        collected.customId === this.buttonRow.previousId ||
-        collected.customId === this.buttonRow.nextId,
-    });
+    const collector = this.buttonRow.collect(reply);
 
-    collector.on('collect', async (collected) => {
-      const action = collected.customId;
-      if (action === this.buttonRow?.nextId) {
-        await this.next();
-      }
-      if (action === this.buttonRow?.previousId) {
-        await this.previous();
-      }
-      await collected.deferUpdate();
-      return;
+    collector.on('collect', () => {
+      return this.updatePages();
     });
 
     collector.on('end', async () => {
@@ -71,16 +57,11 @@ export class PaginatedFieldReply implements InteractionReplyOptions {
     });
   }
 
-  private async previous(): Promise<void> {
-    this.buttonRow.previous();
+  private async updatePages(): Promise<void> {
     this.updateEmbeds();
     await this.interaction.editReply(this);
   }
-  private async next(): Promise<void> {
-    this.buttonRow.next();
-    this.updateEmbeds();
-    await this.interaction.editReply(this);
-  }
+
   private async disable(): Promise<void> {
     this.buttonRow.disable();
     await this.interaction.editReply(this);

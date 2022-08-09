@@ -1,7 +1,14 @@
-import { MessageActionRow, MessageButton } from 'discord.js';
+import {
+  ButtonInteraction,
+  InteractionCollector,
+  Message,
+  MessageActionRow,
+  MessageButton,
+} from 'discord.js';
 
 export class PaginationActionRow extends MessageActionRow {
   currentPage = 1;
+  enabled = true;
   readonly previousId = 'previous';
   readonly nextId = 'next';
 
@@ -42,14 +49,41 @@ export class PaginationActionRow extends MessageActionRow {
     return this;
   }
 
-  private setDisabledStates(): void {
-    this.previousButton.setDisabled(!this.canPrevious);
-    this.nextButton.setDisabled(!this.canNext);
+  private setDisabledStates(): this {
+    if (this.enabled) {
+      this.previousButton.setDisabled(!this.canPrevious);
+      this.nextButton.setDisabled(!this.canNext);
+    } else {
+      this.previousButton.setDisabled(true);
+      this.nextButton.setDisabled(true);
+    }
+    return this;
   }
 
   disable(): this {
-    this.previousButton.setDisabled(true);
-    this.nextButton.setDisabled(true);
-    return this;
+    this.enabled = false;
+    return this.setDisabledStates();
+  }
+
+  collect(
+    message: Message<true>
+  ): InteractionCollector<ButtonInteraction<'cached'>> {
+    return message.createMessageComponentCollector({
+      componentType: 'BUTTON',
+      time: 120000,
+      filter: (collected) => {
+        if (collected.customId === this.nextId) {
+          this.next();
+          void collected.deferUpdate();
+          return true;
+        }
+        if (collected.customId === this.previousId) {
+          this.previous();
+          void collected.deferUpdate();
+          return true;
+        }
+        return false;
+      },
+    });
   }
 }
