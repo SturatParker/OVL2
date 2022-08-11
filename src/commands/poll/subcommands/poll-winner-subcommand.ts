@@ -50,7 +50,7 @@ export class PollWinnerSubcommand extends Command {
         top_n
       )} submissions`,
     });
-    const reply = new PaginatedListReply(interaction, embed, items);
+    const reply = new PaginatedListReply(interaction, embed, items, 10);
 
     await reply.send();
   }
