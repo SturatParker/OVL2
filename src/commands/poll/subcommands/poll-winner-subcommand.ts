@@ -17,9 +17,10 @@ export class PollWinnerSubcommand extends Command {
     const channel = interaction.options.getChannel('channel', true);
     const top_n = interaction.options.getInteger('top_n') ?? 3;
 
-    const [submissions, poll] = await Promise.all([
+    const [submissions, poll, allVoters] = await Promise.all([
       this.pollService.getTop(channel.id, top_n),
       this.pollService.getPoll(channel.id),
+      this.pollService.getAllVoters(channel.id),
     ]);
 
     if (!poll) {
@@ -43,12 +44,12 @@ export class PollWinnerSubcommand extends Command {
       timestamp: new Date(),
       description: `A total of ${
         poll.voteCount
-      } votes were cast in ${Mention.channel(
-        channel
-      )} this round. Showing the top ${Math.min(
+      } votes were cast in ${Mention.channel(channel)} this round.\n${
+        allVoters.size
+      } members participated.\nShowing the top ${Math.min(
         items.length,
         top_n
-      )} submissions`,
+      )} submissions:`,
     });
     const reply = new PaginatedListReply(interaction, embed, items, 10);
 

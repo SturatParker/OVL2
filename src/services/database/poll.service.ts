@@ -48,6 +48,16 @@ export class PollService extends DatabaseService<IPoll> {
     );
   }
 
+  public async getAllVoters(channelId: string): Promise<Set<string>> {
+    const documents = await this.db
+      .collection<ISubmission>('Submissions')
+      .find({ channelId })
+      .toArray();
+    return documents
+      .flatMap((item) => item.voterIds)
+      .reduce((set, id) => set.add(id), new Set<string>());
+  }
+
   public async removeVotes(channelId: string, quantity = 1): Promise<void> {
     return this.addVotes(channelId, 0 - quantity);
   }
