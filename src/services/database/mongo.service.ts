@@ -1,16 +1,9 @@
-import {
-  Collection,
-  Db,
-  DbOptions,
-  MongoClient,
-  ServerApiVersion,
-} from 'mongodb';
+import { Db, DbOptions, MongoClient, ServerApiVersion } from 'mongodb';
 
 export class MongoService {
   private client: MongoClient;
   private url: string;
   private uri: string;
-  public collections: { votes?: Collection; polls?: Collection } = {};
 
   constructor() {
     const { DB_USER, DB_PASSWORD, DB_URL } = process.env;
