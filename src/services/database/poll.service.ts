@@ -53,7 +53,7 @@ export class PollService extends DatabaseService<IPoll> {
   public async resetVotes(channelId: string): Promise<void> {
     const removeVotes = this.submissions.updateMany(
       { channelId },
-      { $set: { voterIds: [] } }
+      { $set: { voterIds: [], voteCount: 0 } }
     );
     const resetPoll = this.collection.updateOne(
       { channelId },
