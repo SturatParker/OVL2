@@ -10,7 +10,7 @@ export class UserService extends DatabaseService<IUser> {
   constructor(mongoService: MongoService) {
     super(mongoService);
     this.db = mongoService.db('Polling');
-    this.collection = this.db.collection('Users');
+    this.collection = this.db.collection('Polls');
   }
 
   async getUser(userId: string): Promise<User> {

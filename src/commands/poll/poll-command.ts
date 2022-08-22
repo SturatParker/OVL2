@@ -1,4 +1,6 @@
-import { CommandInteraction } from 'discord.js';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ColourUtils } from 'src/common/utils/colour.utils';
+import { Mention } from 'src/common/utils/mention.utils';
 import { Command } from '../../common/core/command.abstract';
 import { PollService } from '../../services/database/poll.service';
 import { poll } from './poll-command.definition';
@@ -28,6 +30,8 @@ export class PollCommand extends Command {
         return this.random(interaction);
       case 'shuffle':
         return this.shuffle(interaction);
+      case 'reset':
+        return this.reset(interaction);
       default:
         break;
     }
@@ -97,5 +101,27 @@ export class PollCommand extends Command {
 
   public async shuffle(interaction: CommandInteraction): Promise<void> {
     return this.notYetImplemented(interaction);
+  }
+
+  public async reset(interaction: CommandInteraction<'cached'>): Promise<void> {
+    const channel = interaction.options.getChannel('channel', true);
+    const poll = await this.pollService.getPoll(channel.id);
+    const embed = new MessageEmbed({
+      title: 'Poll Reset',
+      timestamp: new Date(),
+    });
+    if (!poll) {
+      embed
+        .setColor(ColourUtils.error)
+        .setDescription(`${Mention.channel(channel)} is not a Poll channel`);
+    } else {
+      await this.pollService.resetVotes(channel.id);
+      embed
+        .setColor(ColourUtils.success)
+        .setDescription(
+          `Successfully reset submission data in ${Mention.channel(channel)}`
+        );
+    }
+    await interaction.reply({ embeds: [embed] });
   }
 }

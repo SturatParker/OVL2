@@ -91,4 +91,12 @@ export const poll = new SlashCommandBuilder()
       .addChannelOption((option) =>
         option.setName('channel').setDescription('Channel').setRequired(true)
       )
+  )
+  .addSubcommand((subCommand) =>
+    subCommand
+      .setName('reset')
+      .setDescription('Reset votes in a poll')
+      .addChannelOption((option) =>
+        option.setName('channel').setDescription('Channel').setRequired(true)
+      )
   );
