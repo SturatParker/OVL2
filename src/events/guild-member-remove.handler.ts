@@ -10,6 +10,9 @@ export class GuildMemberRemoveHandler extends ClientEventHandler<'guildMemberRem
     super('guildMemberRemove');
   }
   async execute(member: GuildMember | PartialGuildMember): Promise<void> {
+    console.log(
+      `guildMemberRemove:\n\tGuild:${member.guild.id}\n\tMember: ${member.id}`
+    );
     const iconURL = member.user?.avatarURL() ?? member.user?.defaultAvatarURL;
 
     const joinedAt = member.joinedAt;
