@@ -3,6 +3,7 @@ import { Period } from 'src/common/models/period.model';
 import { ClientEventHandler } from 'src/common/types/client-event-handler.type';
 import { ColourUtils } from 'src/common/utils/colour.utils';
 import { GuildUtils } from 'src/common/utils/guild.utils';
+import { Mention } from 'src/common/utils/mention.utils';
 
 export class GuildMemberRemoveHandler extends ClientEventHandler<'guildMemberRemove'> {
   constructor() {
@@ -19,6 +20,7 @@ export class GuildMemberRemoveHandler extends ClientEventHandler<'guildMemberRem
       author: { name: member.user.tag, iconURL },
       title: 'Member Left',
       thumbnail: { url: iconURL },
+      description: `${Mention.user(member.id)} as left.`,
       fields: [
         {
           name: 'Member since',
@@ -35,7 +37,7 @@ export class GuildMemberRemoveHandler extends ClientEventHandler<'guildMemberRem
         },
       ],
       color: ColourUtils.error,
-      timestamp: Date.now(),
+      timestamp: now,
       footer: { text: `ID: ${member.id}` },
     });
 
