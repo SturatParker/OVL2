@@ -1,5 +1,5 @@
 import { GuildMember, MessageEmbed } from 'discord.js';
-import { Period } from 'src/common/models/period.model';
+import { Period } from '../common/models/period.model';
 import { ClientEventHandler } from '../common/types/client-event-handler.type';
 import { ColourUtils } from '../common/utils/colour.utils';
 import { GuildUtils } from '../common/utils/guild.utils';

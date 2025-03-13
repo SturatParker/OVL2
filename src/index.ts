@@ -1,7 +1,7 @@
 import { Client, Intents } from 'discord.js';
-import { EnvUtils } from './common/utils/env.utils';
-import { MongoService } from './services/database/mongo.service';
-import { OVLClientService } from './services/OVLClient.service';
+import { EnvUtils } from 'src/common/utils/env.utils';
+import { MongoService } from 'src/services/database/mongo.service';
+import { OVLClientService } from 'src/services/OVLClient.service';
 
 const mongoService = new MongoService();
 const client = new Client({

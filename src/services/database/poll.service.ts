@@ -1,7 +1,7 @@
 import { Collection, Db } from 'mongodb';
 import { IPoll, Poll } from 'src/common/models/poll.model';
 import { ISubmission, Submission } from 'src/common/models/submission.model';
-import { IUser } from './../../common/models/user.model';
+import { IUser } from 'src/common/models/user.model';
 import { DatabaseService } from './database.service';
 import { MongoService } from './mongo.service';
 

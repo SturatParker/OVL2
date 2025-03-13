@@ -1,5 +1,5 @@
 import { Client } from 'discord.js';
-import { ClientEventHandler } from 'src/common/types/client-event-handler.type';
+import { ClientEventHandler } from '../common/types/client-event-handler.type';
 
 export class ReadyHandler extends ClientEventHandler<'ready'> {
   constructor() {

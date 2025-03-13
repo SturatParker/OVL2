@@ -1,8 +1,8 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { ColourUtils } from 'src/common/utils/colour.utils';
 import { Mention } from 'src/common/utils/mention.utils';
-import { Command } from '../../common/core/command.abstract';
-import { PollService } from '../../services/database/poll.service';
+import { Command } from 'src/common/core/command.abstract';
+import { PollService } from 'src/services/database/poll.service';
 import { poll } from './poll-command.definition';
 import { PollWinnerSubcommand } from './subcommands/poll-winner-subcommand';
 

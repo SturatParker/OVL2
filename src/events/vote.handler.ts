@@ -6,9 +6,9 @@ import {
   PartialUser,
   User,
 } from 'discord.js';
-import { Poll } from 'src/common/models/poll.model';
-import { Submission } from 'src/common/models/submission.model';
-import { ClientEventHandler } from 'src/common/types/client-event-handler.type';
+import { Poll } from '../common/models/poll.model';
+import { Submission } from '../common/models/submission.model';
+import { ClientEventHandler } from '../common/types/client-event-handler.type';
 import { ColourUtils } from '../common/utils/colour.utils';
 import { PollService } from '../services/database/poll.service';
 import { SubmissionService } from '../services/database/submission.service';
