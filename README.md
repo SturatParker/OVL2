@@ -2,6 +2,15 @@
 
 Requires node.js 17 or later
 
+
+### Development
+Install as standard to install development dependencies
+`npm install`
+
+### Production
+Install production only deps via
+`npm run install:prod`
+
 ## Environment
 
 See .env.example for a required fields.
@@ -9,6 +18,7 @@ See .env.example for a required fields.
 
 ## Serve
 
+Application is served directly from .ts via tpx without compilation into js
 `npm run serve`
 
 ## PM2
