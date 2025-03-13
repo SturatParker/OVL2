@@ -5,7 +5,7 @@ import { ColourUtils } from 'src/common/utils/colour.utils';
 import { Mention } from 'src/common/utils/mention.utils';
 import { Numeric } from 'src/common/utils/numeric.utils';
 import { PollService } from 'src/services/database/poll.service';
-import { PaginatedListReply } from '../../../common/core/paginated-list-reply';
+import { PaginatedListReply } from 'src/common/core/paginated-list-reply';
 import { poll } from '../poll-command.definition';
 
 export class PollWinnerSubcommand extends Command {

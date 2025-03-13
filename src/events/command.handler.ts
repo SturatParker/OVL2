@@ -1,6 +1,6 @@
 import { CacheType, Collection, Interaction } from 'discord.js';
-import { Command } from 'src/common/core/command.abstract';
-import { ClientEventHandler } from 'src/common/types/client-event-handler.type';
+import { Command } from '../common/core/command.abstract';
+import { ClientEventHandler } from '../common/types/client-event-handler.type';
 
 export class CommandHandler extends ClientEventHandler<'interactionCreate'> {
   private commands: Collection<string, Command> = new Collection();

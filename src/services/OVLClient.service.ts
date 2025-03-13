@@ -1,15 +1,15 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { Client, Message } from 'discord.js';
-import { Command } from 'src/common/core/command.abstract';
-import { ClientEventHandler } from 'src/common/types/client-event-handler.type';
+import { Command } from '../common/core/command.abstract';
+import { ClientEventHandler } from '../common/types/client-event-handler.type';
 import {
   CommandHandler,
   onError,
   onGuildMemberAdd,
   onGuildMemberRemove,
   VoteHandler,
-} from 'src/events';
+} from '../events';
 import { PollCommand } from '../commands/poll/poll-command';
 import { CancelVoteCommand } from './../commands/cancel-vote/cancel-vote.command';
 import { MyVotesCommand } from './../commands/my-votes/my-votes.command';

@@ -11,7 +11,7 @@
     "paths": {
       "src/*": ["src/*"]
     },
-    "plugins": [{ "transform": "typescript-transform-paths" }],
+    "plugins": [],
     "strict": true,
     "alwaysStrict": true,
     "noImplicitAny": true,
@@ -23,8 +23,6 @@
     "transpileOnly": true,
     "require": [
       "dotenv/config",
-      "typescript-transform-paths/register",
-      "tsconfig-paths/register"
     ]
   }
 }

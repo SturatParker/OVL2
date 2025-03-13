@@ -7,9 +7,9 @@ import {
 } from 'discord.js';
 import { Command } from 'src/common/core/command.abstract';
 import { PollService } from 'src/services/database/poll.service';
-import { ColourUtils } from '../../common/utils/colour.utils';
-import { SubmissionService } from '../../services/database/submission.service';
-import { UserService } from './../../services/database/user.service';
+import { ColourUtils } from 'src/common/utils/colour.utils';
+import { SubmissionService } from 'src/services/database/submission.service';
+import { UserService } from 'src/services/database/user.service';
 import { cancelVote } from './cancel-vote.definition';
 
 export class CancelVoteCommand extends Command {
