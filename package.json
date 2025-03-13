@@ -5,6 +5,7 @@
   "main": "dist/src/index.js",
   "scripts": {
     "lint": "eslint . --ext .ts --fix",
+    "install:prod":"npm install --omit=dev",
     "serve": "tsx --no-warnings --env-file=.env src/index.ts",
     "dev": "ts-node-dev src/index.ts",
     "test": "jest --coverage"
